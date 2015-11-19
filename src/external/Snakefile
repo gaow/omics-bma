@@ -1,0 +1,32 @@
+GSL_VERSION = "2.1"
+SM_VERSION = "3.5.2"
+
+rule all:
+  input: "eqtlbma", "gsl", "snakemake"
+
+rule eqtlbma:
+  params: url = "https://github.com/gaow/eqtlbma.git"
+  output: "eqtlbma"
+  shell: "git clone -b omics-bma {params.url}"
+
+rule gsl:
+  params: url = "ftp://ftp.gnu.org/gnu/gsl/gsl-{0}.tar.gz".format(GSL_VERSION)
+  output: "gsl"
+  shell:
+    '''
+    rm -rf gsl-{GSL_VERSION}*
+    wget {params.url}
+    tar -zxvf gsl-{GSL_VERSION}.tar.gz
+    ln -s gsl-{GSL_VERSION} {output}
+    '''
+
+rule snakemake:
+  params: url = "https://bitbucket.org/snakemake/snakemake/get/v{0}.zip".format(SM_VERSION)
+  output: "snakemake"
+  shell:
+    '''
+    rm -rf v{SM_VERSION}.zip {output}
+    wget {params.url}
+    unzip v{SM_VERSION}.zip
+    mv *{output}* {output}
+    '''
