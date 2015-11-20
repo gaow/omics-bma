@@ -2,7 +2,7 @@ GSL_VERSION = "2.1"
 SM_VERSION = "3.5.2"
 
 rule all:
-  input: "eqtlbma", "gsl", "snakemake"
+  input: "eqtlbma", "gsl", "snakemake", "hdf5io.py"
 
 rule eqtlbma:
   params: url = "https://github.com/gaow/eqtlbma.git"
@@ -30,3 +30,8 @@ rule snakemake:
     unzip v{SM_VERSION}.zip
     mv *{output}* {output}
     '''
+
+rule hdf5io:
+  params: url = "https://raw.githubusercontent.com/uchicago-cs/deepdish/master/deepdish/io/hdf5io.py"
+  output: "hdf5io.py"
+  shell: "wget -q {params.url} -O {output}"
