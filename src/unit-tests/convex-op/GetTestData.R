@@ -1,0 +1,11 @@
+set.seed(100)
+options(digits = 13)
+sampsize = 10000
+sd = c(1, 1.1, 1.2)
+z = rnorm(sampsize, 0, sample(sd, sampsize, replace = TRUE))
+lik = t(vapply(z, dnorm, sd, sd = sd))
+prior = c(1, 1, 1)
+pi.init = c(0.3, 0.2, 0.5)
+write.table(lik, 'data.txt', row.names = F, col.names = F)
+write(prior, 'prior.txt')
+write(pi.init, 'init.txt')

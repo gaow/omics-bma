@@ -1,0 +1,10 @@
+rule get_test_data:
+     output: "prior.txt", "init.txt", "data.txt"
+     shell: "Rscript GetTestData.R"
+
+rule compare_mix_fit:
+     output: "EM.res", "COP.res"
+     shell: "Rscript GetTestData.R"
+
+rule all:
+     input: rules.get_test_data.output, rules.compare_mix_fit.output
