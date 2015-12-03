@@ -1,0 +1,10 @@
+configfile: "config.yaml"
+
+rule r1:
+  input: "sidebar.notes"
+  output: "sidebar.txt"
+  shell: "{config[wk]} {input} -o {output} --compact_toc"
+
+rule all:
+  input: rules.r1.output
+  shell: "rsync -auvP --include='*/' --include='*.txt' --exclude='*' --prune-empty-dirs --delete ./* {config[user]}@{config[path]}"

@@ -1,9 +1,5 @@
 configfile: "config.yaml"
 
-rule all:
-  input:
-    "../../README.md"
-
 rule doc_home:
   input:
     config["doc-home"].split()[0]
@@ -11,3 +7,6 @@ rule doc_home:
     "../../README.md"
   shell:
     "{config[md]} {input} -o {output}"
+
+rule all:
+  input: rules.doc_home.output

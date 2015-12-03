@@ -1,4 +1,2 @@
 md: tigernotes markdown
-pdf: tigernotes doc --footnote --font_size 12 -a "Gao Wang" -t "OmicsBMA Documentation [version alpha]"
-wiki: tigernotes dokuwiki --inline_toc --permission "@user"
 doc-home: Home.notes

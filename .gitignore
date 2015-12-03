@@ -1,3 +1,4 @@
 .snakemake
+doc/wiki/run.sh
 src/external/*
 !src/external/Snakefile
