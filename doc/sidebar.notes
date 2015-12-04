@@ -8,18 +8,18 @@
 # ""[Installation|@installation@]""
 #}
 #{list
-# ""[Concepts|@concepts/start@]""
+# ""[Concepts|@concepts@]""
 #}
 #{list
-# ""[Tutorials|@tutorials/start@]""
+# ""[Tutorials|@tutorials@]""
 #}
 #{list
-# ""[Applications|@applications/start@]""
+# ""[Applications|@applications@]""
 ## [cis-eQTL Discovery with GTEx data|@applications/gtex-eqtl@]
 #}
 #{list
 # ""[User Manual|@manual/start@]""
 #}
 #{list
-# ""[For Developers|@src/start@]""
+# ""[For Developers|@development/start@]""
 #}

@@ -2,24 +2,41 @@ configfile: "config.yaml"
 
 rule home:
   input:
-    "home.notes", "sidebar-src.notes"
+    "home.notes", "sidebar-development.notes"
   output:
     "../README.md",
-    "wiki/src/start.txt",
-    "wiki/src/sidebar.txt"
+    "wiki/development/start.txt",
+    "wiki/development/sidebar.txt"
   shell:
     '''
-    {config[md]} {input[0]} {input[1]} -o {output[0]};
-    {config[wk]} {input[0]} {input[1]} -o {output[1]} --compact_toc
+    {config[md]} {input[0]} -o {output[0]};
+    {config[wk]} {input[0]} -o {output[1]} --compact_toc
     {config[wk]} {input[1]} -o {output[2]} --compact_toc
     '''
+
+rule doc:
+  input:
+    "doc.notes"
+  output:
+    "README.md"
+  shell:
+    "{config[md]} {input} -o {output}"
+
+rule src:
+  input:
+    "src.notes"
+  output:
+    "../src/README.md"
+  shell:
+    "{config[md]} {input} -o {output}"
+
 
 rule src_internal_pyeqtlbma:
   input:
     "pyeqtlbma.notes"
   output:
     "../src/internal/pyeqtlbma/README.md",
-    "wiki/src/internal/pyeqtlbma.txt"
+    "wiki/development/internal/pyeqtlbma.txt"
   shell:
     '''
     {config[md]} {input} -o {output[0]};
@@ -31,7 +48,7 @@ rule src_external:
     "extern-lib.notes"
   output:
     "../src/external/README.md",
-    "wiki/src/external.txt"
+    "wiki/development/external.txt"
   shell:
     '''
     {config[md]} {input} -o {output[0]};
@@ -43,7 +60,7 @@ rule src_internal:
     "intern-lib.notes"
   output:
     "../src/internal/README.md",
-    "wiki/src/internal.txt"
+    "wiki/development/internal.txt"
   shell:
     '''
     {config[md]} {input} -o {output[0]};
@@ -57,6 +74,8 @@ rule W1:
 
 rule all:
   input:
-    rules.home.output, rules.src_internal_pyeqtlbma.output, rules.src_external.output, rules.src_internal.output,
+    rules.home.output, rules.src_internal_pyeqtlbma.output,
+    rules.src_external.output, rules.src_internal.output,
+    rules.doc.output, rules.src.output,
     rules.W1.output
-  shell: "rsync -auvP --include='*/' --include='*.txt' --exclude='*' --prune-empty-dirs --delete wiki/* {config[user]}@{config[path]}"
+  shell: "rsync -av --include='*/' --include='*.txt' --exclude='*' --prune-empty-dirs --delete --delete-excluded wiki/ {config[user]}@{config[path]}"

@@ -1,5 +1,0 @@
-#{list
-# **[External libraries|@src/external@]**
-# **[OmicBMA library|@src/internal@]**
-## [Python interface for eqtlbma|@src/internal/pyeqtlbma@]
-#}

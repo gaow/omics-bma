@@ -1,0 +1,2 @@
+# Documentation
+Executing command `snakemake all` under this directory deploys documentation for each folder in this repository (the `README.md` file), as well the entire [OmicsBMA Wiki](http://bioinformatics.org/bma). `README.md` documents thus generated are the same material as on the [user manual](http://bioinformatics.org/bma/manual) and [developer's info](http://bioinformatics.org/bma/development) Wiki pages, only that the Wiki is better organized and easier to browse.
