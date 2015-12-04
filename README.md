@@ -1,5 +1,8 @@
 # About
-OmicsBMA is a machinery to interrogate genomics / transcriptomics data via Bayesian Model Averaging.
+OmicsBMA is a machinery to interrogate genomics / transcriptomics data via Bayesian Model Averaging. The [github repository](https://github.com/gaow/omics-bma) hosts its source code and technical documentation for developers. Users should refer to the [OmicsBMA Wiki](http://bioinformatics.org/bma) for statistical methods description, software manual and data analysis tutorials.
 
-## Author
-Gao Wang
+# Change Log
+# Development
+*  **[External libraries](src/external)**
+*  **[OmicBMA library](src/internal)**
+ *  [Python interface for eqtlbma](src/internal/pyeqtlbma)

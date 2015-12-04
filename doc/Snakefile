@@ -1,0 +1,62 @@
+configfile: "config.yaml"
+
+rule home:
+  input:
+    "home.notes", "sidebar-src.notes"
+  output:
+    "../README.md",
+    "wiki/src/start.txt",
+    "wiki/src/sidebar.txt"
+  shell:
+    '''
+    {config[md]} {input[0]} {input[1]} -o {output[0]};
+    {config[wk]} {input[0]} {input[1]} -o {output[1]} --compact_toc
+    {config[wk]} {input[1]} -o {output[2]} --compact_toc
+    '''
+
+rule src_internal_pyeqtlbma:
+  input:
+    "pyeqtlbma.notes"
+  output:
+    "../src/internal/pyeqtlbma/README.md",
+    "wiki/src/internal/pyeqtlbma.txt"
+  shell:
+    '''
+    {config[md]} {input} -o {output[0]};
+    {config[wk]} {input} -o {output[1]} --compact_toc
+    '''
+
+rule src_external:
+  input:
+    "extern-lib.notes"
+  output:
+    "../src/external/README.md",
+    "wiki/src/external.txt"
+  shell:
+    '''
+    {config[md]} {input} -o {output[0]};
+    {config[wk]} {input} -o {output[1]} --compact_toc
+    '''
+
+rule src_internal:
+  input:
+    "intern-lib.notes"
+  output:
+    "../src/internal/README.md",
+    "wiki/src/internal.txt"
+  shell:
+    '''
+    {config[md]} {input} -o {output[0]};
+    {config[wk]} {input} -o {output[1]} --compact_toc
+    '''
+
+rule W1:
+  input: "sidebar.notes"
+  output: "wiki/sidebar.txt"
+  shell: "{config[wk]} {input} -o {output} --compact_toc"
+
+rule all:
+  input:
+    rules.home.output, rules.src_internal_pyeqtlbma.output, rules.src_external.output, rules.src_internal.output,
+    rules.W1.output
+  shell: "rsync -auvP --include='*/' --include='*.txt' --exclude='*' --prune-empty-dirs --delete wiki/* {config[user]}@{config[path]}"

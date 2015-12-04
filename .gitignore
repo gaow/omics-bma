@@ -1,4 +1,5 @@
 .snakemake
-doc/wiki/run.sh
+doc/run.sh
 src/external/*
 !src/external/Snakefile
+!src/external/README
