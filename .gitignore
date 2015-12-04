@@ -2,4 +2,4 @@
 doc/run.sh
 src/external/*
 !src/external/Snakefile
-!src/external/README
+!src/external/README.md
