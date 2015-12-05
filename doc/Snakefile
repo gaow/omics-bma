@@ -33,7 +33,7 @@ rule src:
 
 rule src_internal_pyeqtlbma:
   input:
-    "pyeqtlbma.notes"
+    "internal-pyeqtlbma.notes"
   output:
     "../src/internal/pyeqtlbma/README.md",
     "wiki/development/internal/pyeqtlbma.txt"
@@ -45,7 +45,7 @@ rule src_internal_pyeqtlbma:
 
 rule src_external:
   input:
-    "extern-lib.notes"
+    "external.notes"
   output:
     "../src/external/README.md",
     "wiki/development/external.txt"
@@ -57,7 +57,7 @@ rule src_external:
 
 rule src_internal:
   input:
-    "intern-lib.notes"
+    "internal.notes"
   output:
     "../src/internal/README.md",
     "wiki/development/internal.txt"
@@ -78,4 +78,4 @@ rule all:
     rules.src_external.output, rules.src_internal.output,
     rules.doc.output, rules.src.output,
     rules.W1.output
-  shell: "rsync -av --include='*/' --include='*.txt' --exclude='*' --prune-empty-dirs --delete --delete-excluded wiki/ {config[user]}@{config[path]}"
+  shell: "rsync -av --include='*/' --include='*.txt' --exclude='*' --prune-empty-dirs --delete --delete-excluded --chmod=g+w wiki/ {config[user]}@{config[path]}"
