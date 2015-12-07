@@ -1,4 +1,4 @@
-GSL_VERSION = "2.1"
+GSL_VERSION = "1.16"
 SM_VERSION = "3.5.2"
 
 rule all:
@@ -14,7 +14,7 @@ rule gsl:
   output: "gsl"
   shell:
     '''
-    rm -rf gsl-{GSL_VERSION}*
+    rm -rf gsl*
     wget {params.url}
     tar -zxvf gsl-{GSL_VERSION}.tar.gz
     ln -s gsl-{GSL_VERSION} {output}

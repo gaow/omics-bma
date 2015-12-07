@@ -4,7 +4,7 @@
 %module pyeqtlbma
 
 %{
-#include "pyeqtlbma.h"
+#include "libeqtlbma.hpp"
 #include "gsl/gsl_errno.h"
 #include "gsl/gsl_sf_gamma.h"
 #include "gsl/gsl_cdf.h"
@@ -38,19 +38,19 @@ int gsl_initialize()
     {
         $function
     }
-    catch(vtools::IndexError e)
+    catch(pyeqtlbma::IndexError e)
     {
         SWIG_exception(SWIG_IndexError, e.message());
     }
-    catch(vtools::ValueError e)
+    catch(pyeqtlbma::ValueError e)
     {
         SWIG_exception(SWIG_ValueError, e.message());
     }
-    catch(vtools::SystemError e)
+    catch(pyeqtlbma::SystemError e)
     {
         SWIG_exception(SWIG_SystemError, e.message());
     }
-    catch(vtools::RuntimeError e)
+    catch(pyeqtlbma::RuntimeError e)
     {
         SWIG_exception(SWIG_RuntimeError, e.message());
     }
@@ -69,18 +69,25 @@ int gsl_initialize()
 
 namespace std
 {
-    %template(vectors)    vector<string>;
-    %template(vectorf)    vector<double>;
-    %template(vectori)    vector<int>;
-    %template(matrixi)    vector<vector<int> >;
-    %template(matrixf)    vector<vector<double> >;
-    %template(vectora)    vector<vtools::BaseAction * >;
+  %template(vectors)    vector<string>;
+  %template(vectorf)    vector<double>;
+  %template(vectori)    vector<int>;
+  %template(matrixi)    vector<vector<int> >;
+  %template(matrixf)    vector<vector<double> >;
+  %template(dict_vectors) map<string, vector<string> >;
+  %template(dict_vectorf) map<string, vector<double> >;
+  %template(dict_vectori) map<string, vector<int> >;
+  %template(dict_matrixi) map<string, vector<vector<int> > >;
+  %template(dict_matrixf) map<string, vector<vector<double> > >;
+  %template(dict_string) map<string, string>;
+  %template(dict_int) map<string, int>;
+  %template(dict_double) map<string, double>;
 }
 
-%ignore vtools::PyAction::PyAction(const PyAction & rhs);
-%ignore vtools::PyFunc;
+%ignore pyeqtlbma::PyAction::PyAction(const PyAction & rhs);
+%ignore pyeqtlbma::PyFunc;
 
-%include "pyeqtlbma.h"
+%include "libeqtlbma.hpp"
 
 // gsl functions
 extern double gsl_cdf_gaussian_P(double x, double sigma);

@@ -1,0 +1,45 @@
+__doc__ = '''
+setup file for libeqtlbma
+'''
+
+rule help:
+  shell: "snakemake -l"
+
+rule gsl:
+  output: "../../external/gsl/config.log"
+  shell: '''cd ../../external/gsl; ./configure CFLAGS="-O3" --prefix=`pwd`; make; make install; cd -'''
+
+rule swig:
+  input:
+    h = "libeqtlbma.hpp",
+    c = "libeqtlbma.cpp",
+    i = "pyeqtlbma.i",
+  output:
+    cxx = "libeqtlbma_wrap.cxx",
+    py = "pyeqtlbma.py"
+  params:
+    swig_opts = "-c++ -python -O -shadow -keyword -w-511 -w-509"
+  shell:
+    "swig {params.swig_opts} -o {output.cxx} {input.i}"
+
+rule install:
+  input:
+    rules.gsl.output,
+    rules.swig.output
+  output:
+    touch("build.done")
+  shell: "python setup.py install"
+
+rule test:
+  shell: "python example.py"
+
+rule clean:
+  shell: "rm -rf build.done dist *.egg-info"
+
+rule purge:
+  shell: "git clean -df"
+
+rule all:
+  input:
+    "build.done"
+  shell: "snakemake clean"
