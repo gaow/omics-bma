@@ -43,9 +43,11 @@ namespace pyeqtlbma {
   typedef std::map<std::string, std::vector<std::string> > dict_vectors;
   typedef std::map<std::string, std::string> dict_string;
   typedef std::map<std::string, int> dict_int;
-  typedef std::map<std::string, double> dict_double;
+  typedef std::map<std::string, double> dict_float;
+  typedef std::map<std::string, std::map<std::string, std::vector<std::vector<double> > > > dict_dict_matrixf;
 
-int eqtlbma_bf();
+int eqtlbma_bf (
+  );
 
 /// exception handler. Exceptions will be passed to Python.
 class Exception

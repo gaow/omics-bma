@@ -6,8 +6,8 @@ Dependencies of OmicsBMA are:
 *  [DeepDish](https://github.com/uchicago-cs/deepdish)
 *  Version 3.52 of [snakemake](https://bitbucket.org/snakemake/snakemake/wiki/Home)
 
-These libraries can be downloaded via executing command below in the `src/external` folder:
+These libraries can be downloaded via executing command `snakemake all` under the `src/external` folder.
 
-```
-snakemake all
-```
+**_Note_**
+
+ GSL is built into the pyeqtlbma library by static linking. The `libgslcblas` cannot be statically linked unless the build is configured explicitly by `-fPIC`, e.g., `./configure CFLAGS='-O3 -fPIC'`. This has already been taken care of by the installation script for pyeqtlbma library.

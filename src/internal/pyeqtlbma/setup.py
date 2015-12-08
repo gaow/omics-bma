@@ -44,7 +44,7 @@ cpp_methods_ext = Extension("{}._{}".format(PACKAGE, MODULE),
                             )
 
 setup(name        = "{}.{}".format(PACKAGE, MODULE),
-      description = "Library interface from eQTLBMA package",
+      description = "Python interface from eQTLBMA package (the omics-bma branch)",
       author      = "Gao Wang",
       version     = "1.0",
       packages    = [PACKAGE],
