@@ -1,6 +1,6 @@
 # Python Interface for Codes from Eqtlbma
 ## Swig Interface
-`pyeqtlbma.i` defines the interface, for 3 main work-horses: Bayes factor calculation, mixture model fitting and calculation of posterior quantities. Interface is written in `swig`.
+`pyeqtlbma.i` configures the python-cpp binding, for 3 main work-horses: Bayes factor calculation, mixture model fitting and calculation of posterior quantities. It is written in `swig`. The interface functions are defined in `ibeqtlbma.hpp/.cpp` files.
 
 ### Data structure
 Data from python are organized in homogeneous dictionaries (dictionaries of data of the same type) which will be converted to `std::map<std::string, TYPE>` in C++. 5 types are implemented here:

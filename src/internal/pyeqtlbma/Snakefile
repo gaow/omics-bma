@@ -7,7 +7,7 @@ rule help:
 
 rule gsl:
   output: "../../external/gsl/config.log"
-  shell: '''cd ../../external/gsl; ./configure CFLAGS="-O3" --prefix=`pwd`; make; make install; cd -'''
+  shell: '''cd ../../external/gsl; ./configure CFLAGS="-O3 -fPIC" --prefix=`pwd`; make; make install; cd -'''
 
 rule swig:
   input:
