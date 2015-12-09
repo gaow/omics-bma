@@ -1,5 +1,5 @@
 __doc__ = '''
-setup file for libeqtlbma
+setup file for pyeqtlbma
 '''
 
 rule help:
@@ -11,11 +11,11 @@ rule gsl:
 
 rule swig:
   input:
-    h = "libeqtlbma.hpp",
-    c = "libeqtlbma.cpp",
+    h = "pyeqtlbma.hpp",
+    c = "pyeqtlbma.cpp",
     i = "pyeqtlbma.i",
   output:
-    cxx = "libeqtlbma_wrap.cxx",
+    cxx = "pyeqtlbma_wrap.cxx",
     py = "pyeqtlbma.py"
   params:
     swig_opts = "-c++ -python -O -shadow -keyword -w-511 -w-509"

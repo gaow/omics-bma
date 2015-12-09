@@ -1,5 +1,6 @@
 .snakemake
 *.tmp
+*.orig
 doc/wiki
 doc/run.sh
 src/external/*

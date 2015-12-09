@@ -4,7 +4,7 @@
 %module pyeqtlbma
 
 %{
-#include "libeqtlbma.hpp"
+#include "pyeqtlbma.hpp"
 #include "gsl/gsl_errno.h"
 #include "gsl/gsl_sf_gamma.h"
 #include "gsl/gsl_cdf.h"
@@ -88,7 +88,7 @@ namespace std
 %ignore pyeqtlbma::PyAction::PyAction(const PyAction & rhs);
 %ignore pyeqtlbma::PyFunc;
 
-%include "libeqtlbma.hpp"
+%include "pyeqtlbma.hpp"
 
 // gsl functions
 extern double gsl_cdf_gaussian_P(double x, double sigma);

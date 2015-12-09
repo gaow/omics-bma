@@ -25,7 +25,7 @@ INCLUDE_DIR = list(set([x[0] for x in os.walk(EXTERN_LIB_PATH + "/eqtlbma/src") 
 INCLUDE_DIR.append(EXTERN_LIB_PATH + "/gsl/include")
 # LIB_DIR = [EXTERN_LIB_PATH + "/gsl/lib"]
 LIB = ["stdc++", "gomp"]
-SOURCE = ['libeqtlbma_wrap.cxx', 'libeqtlbma.cpp'] + glob.glob(EXTERN_LIB_PATH + "/eqtlbma/**/*.cpp", recursive=True)
+SOURCE = ['pyeqtlbma_wrap.cxx', 'pyeqtlbma.cpp', 'libeqtlbma.cpp'] + glob.glob(EXTERN_LIB_PATH + "/eqtlbma/**/*.cpp", recursive=True)
 SOURCE += glob.glob(EXTERN_LIB_PATH + "/eqtlbma/**/*.cc", recursive=True)
 SOURCE += glob.glob(EXTERN_LIB_PATH + "/eqtlbma/**/*.c", recursive=True)
 SOURCE = [x for x in SOURCE if not os.path.split(x)[-1] in ['eqtlbma_bf.cpp', 'eqtlbma_hm.cpp', 'eqtlbma_avg_bfs.cpp', 'main.c', 'bgzip.c']]
