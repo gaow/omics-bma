@@ -30,7 +30,7 @@ SOURCE += glob.glob(EXTERN_LIB_PATH + "/eqtlbma/**/*.cc", recursive=True)
 SOURCE += glob.glob(EXTERN_LIB_PATH + "/eqtlbma/**/*.c", recursive=True)
 SOURCE = [x for x in SOURCE if not os.path.split(x)[-1] in ['eqtlbma_bf.cpp', 'eqtlbma_hm.cpp', 'eqtlbma_avg_bfs.cpp', 'main.c', 'bgzip.c']]
 ## compiler configs
-COMPILE_ARGS = ["-O3", "-fPIC", "-DVERSION='OmicsBMA'", "-D_FILE_OFFSET_BITS=64", "-DHAVE_SYS_TYPES_H=1", "-DHAVE_SYS_STAT_H=1", "-DHAVE_STDLIB_H=1", "-DHAVE_STRING_H=1", "-DHAVE_MEMORY_H=1", "-DHAVE_STRINGS_H=1", "-DHAVE_INTTYPES_H=1", "-DHAVE_STDINT_H=1", "-DHAVE_UNISTD_H=1", "-DHAVE_DLFCN_H=1", "-DHAVE_LIBZ=1", "-DHAVE_LIBGSLCBLAS=1"]
+COMPILE_ARGS = ["-O3", "--std=c++11", "-fPIC", "-DVERSION='OmicsBMA'", "-D_FILE_OFFSET_BITS=64", "-DHAVE_SYS_TYPES_H=1", "-DHAVE_SYS_STAT_H=1", "-DHAVE_STDLIB_H=1", "-DHAVE_STRING_H=1", "-DHAVE_MEMORY_H=1", "-DHAVE_STRINGS_H=1", "-DHAVE_INTTYPES_H=1", "-DHAVE_STDINT_H=1", "-DHAVE_UNISTD_H=1", "-DHAVE_DLFCN_H=1", "-DHAVE_LIBZ=1", "-DHAVE_LIBGSLCBLAS=1"]
 LINK_ARGS = ["-fopenmp", "-lm", "-lz"] + [EXTERN_LIB_PATH + x for x in ["/gsl/lib/libgsl.a", "/gsl/lib/libgslcblas.a"]]
 
 # compile
