@@ -1,0 +1,3 @@
+s1 data/covariates.txt
+s2 data/covariates.txt
+s3 data/covariates.txt

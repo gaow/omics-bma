@@ -5,7 +5,12 @@
 using namespace std;
 using namespace quantgen;
 using namespace utils;
-using namespace pyeqtlbma;
+
+namespace pyeqtlbma {
+void initialize()
+{
+}
+
 
 // implementation follows from the logic in eqtlbma_bf.cpp
 int eqtlbma_bf(
@@ -17,7 +22,7 @@ int eqtlbma_bf(
                )
 {
 	set<string> sSnpsToKeep;
-	if (!param_s.at("snp").empty()) {
+	if (param_s.find("snp") != param_s.end()) {
 		loadSnpsToKeep(param_s.at("snp"), param_i.at("verbose"), sSnpsToKeep);
 		if (sSnpsToKeep.empty())
 			return 0;
@@ -30,13 +35,14 @@ int eqtlbma_bf(
 	Covariates covariates;
 	map<string, Gene> gene2object;
 
-	if (sstats.empty())
+	// FIXME if(sstats.empty())
+	if (1)
 		loadRawInputData(param_s.at("geno"), param_s.at("scoord"),
 			param_s.at("exp"),
 			param_s.at("gcoord"), param_s.at("anchor"), (size_t)param_i.at(
 				"cis"),
 			param_f.at("maf"), param_s.at("covar"),
-      param_s.at("error"), param_vs.at("sbgrp"), sSnpsToKeep,
+			param_s.at("error"), param_vs.at("sbgrp"), sSnpsToKeep,
 			param_i.at("verbose"),
 			subgroups, samples, snp2object, mChr2VecPtSnps,
 			covariates, gene2object);
@@ -73,7 +79,7 @@ int eqtlbma_bf(
 			cout << " prop_cov_errors=" << param_f.at("fiterr");
 		if (sstats.empty())
 			cout << " anchor=" << param_s.at("anchor") << " radius=" <<
-			param_i.at("cis");
+			    param_i.at("cis");
 		if (is_perm) {
 			cout	<< endl << "permutation" <<
 			(param_i.at("nperm") > 1 ? "s=" : "=")
@@ -141,3 +147,4 @@ int eqtlbma_bf(
 }
 
 
+}

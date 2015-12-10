@@ -245,8 +245,3 @@ void pyeqtlbma::makePermutations(
 }
 
 
-void pyeqtlbma::initialize()
-{
-}
-
-

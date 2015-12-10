@@ -22,16 +22,17 @@ MODULE = 'pyeqtlbma'
 EXTERN_LIB_PATH = os.path.abspath("../../external")
 ## lazy setup: simply include everything from external libraries
 INCLUDE_DIR = list(set([x[0] for x in os.walk(EXTERN_LIB_PATH + "/eqtlbma/src") if len([y for y in os.path.split(x[0]) if y.startswith('.')]) == 0]))
-INCLUDE_DIR.append(EXTERN_LIB_PATH + "/gsl/include")
+INCLUDE_DIR.extend([EXTERN_LIB_PATH + "/gsl/include", "./"])
 # LIB_DIR = [EXTERN_LIB_PATH + "/gsl/lib"]
 LIB = ["stdc++", "gomp"]
-SOURCE = ['pyeqtlbma_wrap.cxx', 'pyeqtlbma.cpp', 'libeqtlbma.cpp'] + glob.glob(EXTERN_LIB_PATH + "/eqtlbma/**/*.cpp", recursive=True)
+SOURCE = glob.glob(EXTERN_LIB_PATH + "/eqtlbma/**/*.cpp", recursive=True)
 SOURCE += glob.glob(EXTERN_LIB_PATH + "/eqtlbma/**/*.cc", recursive=True)
 SOURCE += glob.glob(EXTERN_LIB_PATH + "/eqtlbma/**/*.c", recursive=True)
+SOURCE += ['pyeqtlbma_wrap.cxx', 'libeqtlbma.cpp', 'pyeqtlbma.cpp']
 SOURCE = [x for x in SOURCE if not os.path.split(x)[-1] in ['eqtlbma_bf.cpp', 'eqtlbma_hm.cpp', 'eqtlbma_avg_bfs.cpp', 'main.c', 'bgzip.c']]
 ## compiler configs
 COMPILE_ARGS = ["-O3", "--std=c++11", "-fPIC", "-DVERSION='OmicsBMA'", "-D_FILE_OFFSET_BITS=64", "-DHAVE_SYS_TYPES_H=1", "-DHAVE_SYS_STAT_H=1", "-DHAVE_STDLIB_H=1", "-DHAVE_STRING_H=1", "-DHAVE_MEMORY_H=1", "-DHAVE_STRINGS_H=1", "-DHAVE_INTTYPES_H=1", "-DHAVE_STDINT_H=1", "-DHAVE_UNISTD_H=1", "-DHAVE_DLFCN_H=1", "-DHAVE_LIBZ=1", "-DHAVE_LIBGSLCBLAS=1"]
-LINK_ARGS = ["-fopenmp", "-lm", "-lz"] + [EXTERN_LIB_PATH + x for x in ["/gsl/lib/libgsl.a", "/gsl/lib/libgslcblas.a"]]
+LINK_ARGS = ["-fopenmp", "-lm", "-lz", "-Wl,--no-as-needed"] + [EXTERN_LIB_PATH + x for x in ["/gsl/lib/libgsl.a", "/gsl/lib/libgslcblas.a"]]
 
 # compile
 cpp_methods_ext = Extension("{}._{}".format(PACKAGE, MODULE),

@@ -1,0 +1,3 @@
+s1 data/genotypes.txt.gz
+s2 data/genotypes.txt.gz
+s3 data/genotypes.txt.gz
