@@ -77,7 +77,8 @@ int eqtlbma_bf(
 		        << " error_model=" << param_s.at("error");
 		if (param_s.at("error") != "uvlr") // i.e. if 'mvlr' or 'hybrid'
 			cout << " prop_cov_errors=" << param_f.at("fiterr");
-		if (sstats.empty())
+		// FIXME sstats.empty()
+		if (1)
 			cout << " anchor=" << param_s.at("anchor") << " radius=" <<
 			    param_i.at("cis");
 		if (is_perm) {
@@ -106,7 +107,8 @@ int eqtlbma_bf(
 		size_t step_size = min((int)distance(itG, gene2object.end()),
 			param_i.at("wrtsize"));
 		advance(itG, step_size);
-		testForAssociations(sstats.empty(), mChr2VecPtSnps, param_s.at(
+		// FIXME sstats.empty()
+		testForAssociations(1, mChr2VecPtSnps, param_s.at(
 				"anchor"),
 			(size_t)param_i.at("cis"),
 			subgroups, samples, param_s.at("lik"), param_s.at("analys"),
@@ -142,6 +144,9 @@ int eqtlbma_bf(
 			        << " sec)" << endl << flush;
 		cout	<< "nb of analyzed gene-SNP pairs: " << nbAnalyzedPairs
 		        << " (" << nbAnalyzedGenes << " genes)" << endl;
+
+		cout	<< "END " << __func__
+		        << "max.mem -> " << getMaxMemUsedByProcess2Str() << endl;
 	}
 	return 0;
 }

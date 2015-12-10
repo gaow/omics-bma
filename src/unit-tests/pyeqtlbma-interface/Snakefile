@@ -2,6 +2,7 @@ from OmicsBMA.pyeqtlbma import *
 configfile: "config.yaml"
 
 rule bf:
+  threads: config['thread']
   run:
     param_i = {}
     param_s = {}

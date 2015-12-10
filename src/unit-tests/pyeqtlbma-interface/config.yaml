@@ -3,7 +3,7 @@ scoord: data/snp_coords.bed.gz
 exp: data/list_phenotypes.txt
 gcoord: data/gene_coords.bed.gz
 anchor: TSS
-cis: 10000
+cis: 5
 lik: normal
 analys: join
 qnorm: 1
@@ -16,13 +16,13 @@ gridM: data/matrix-scalars.txt.gz
 bfs: customized
 error: mvlr
 fiterr: 0.5
-nperm: 10000
+nperm: 1000
 seed: 10086
 trick: 0
 tricut: 10
 permsep: 0
 pbf: all
-maxbf: 1
+maxbf: 0
 thread: 4
 snp:
 sbgrp: [s1, s2, s3]
