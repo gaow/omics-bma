@@ -13,7 +13,7 @@ int eqtlbma_bf(
                const dict_int & param_i,
                const dict_float & param_f,
                const dict_dict_matrixf & sstats,
-               const vectors & subgroups_tokeep
+               const dict_vectors & param_vs
                )
 {
 	set<string> sSnpsToKeep;
@@ -36,7 +36,7 @@ int eqtlbma_bf(
 			param_s.at("gcoord"), param_s.at("anchor"), (size_t)param_i.at(
 				"cis"),
 			param_f.at("maf"), param_s.at("covar"),
-			param_s.at("error"), subgroups_tokeep, sSnpsToKeep,
+      param_s.at("error"), param_vs.at("sbgrp"), sSnpsToKeep,
 			param_i.at("verbose"),
 			subgroups, samples, snp2object, mChr2VecPtSnps,
 			covariates, gene2object);
