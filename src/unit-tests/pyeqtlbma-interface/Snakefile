@@ -20,4 +20,11 @@ rule bf:
             param_i[k] = val
         else:
             pass
-    eqtlbma_bf(param_s, param_i, param_f, sstats, param_vs)
+    exe = eQtlBma()
+    exe.eqtlbma_bf(param_s, param_i, param_f, sstats, param_vs)
+    res = {}
+    for k,val in list(dict(exe.GetSstats()).items()):
+        res[k] = {}
+        for k2, val2 in list(dict(val).items()):
+            res[k][k2] = list(val2)
+    print(res)

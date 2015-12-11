@@ -25,6 +25,10 @@ typedef std::map<std::string,
                  std::map<std::string,
                           std::vector<std::vector<double> > > >
     dict_dict_matrixf;
+typedef std::map<std::string,
+                 std::map<std::string,
+                          std::vector<std::string > > >
+    dict_dict_vectors;
 
 /// exception handler. Exceptions will be passed to Python.
 class Exception
@@ -102,12 +106,26 @@ public:
 // initialize C++ module, currently does nothing
 void initialize();
 
-int eqtlbma_bf(
-	const dict_string & param_s,
-	const dict_int & param_i,
-	const dict_float & param_f,
-	const dict_dict_matrixf & sstats,
-	const dict_vectors & param_vs);
+class eQtlBma
+{
+public:
+	eQtlBma () {};
+	~eQtlBma() {};
+
+	int eqtlbma_bf(
+		const dict_string & param_s,
+		const dict_int & param_i,
+		const dict_float & param_f,
+		const dict_dict_matrixf & sstats,
+		const dict_vectors & param_vs);
+
+	dict_dict_matrixf GetSstats() { return m_sstats; };
+	dict_dict_vectors GetSnps() { return m_snps; };
+
+private:
+	dict_dict_matrixf m_sstats;
+	dict_dict_vectors m_snps;
+};
 
 }
 #endif

@@ -14,9 +14,9 @@ gridS: data/grid_phi2_oma2_with-configs.txt.gz
 priorM: data/prior-matrix*.txt.gz
 gridM: data/matrix-scalars.txt.gz
 bfs: customized
-error: mvlr
+error: hybrid
 fiterr: 0.5
-nperm: 1000
+nperm: 100
 seed: 10086
 trick: 0
 tricut: 10

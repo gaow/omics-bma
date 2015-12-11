@@ -13,13 +13,13 @@ void initialize()
 
 
 // implementation follows from the logic in eqtlbma_bf.cpp
-int eqtlbma_bf(
-               const dict_string & param_s,
-               const dict_int & param_i,
-               const dict_float & param_f,
-               const dict_dict_matrixf & sstats,
-               const dict_vectors & param_vs
-               )
+int eQtlBma::eqtlbma_bf(
+                        const dict_string & param_s,
+                        const dict_int & param_i,
+                        const dict_float & param_f,
+                        const dict_dict_matrixf & sstats,
+                        const dict_vectors & param_vs
+                        )
 {
 	set<string> sSnpsToKeep;
 	if (param_s.find("snp") != param_s.end()) {
@@ -93,7 +93,7 @@ int eqtlbma_bf(
 				cout << " perm_sep=" << param_i.at("permsep");
 			else if (param_s.at("analys") == "join")
 				cout << " perm_bf=" << param_s.at("pbf");
-			cout << " threads=" << omp_get_max_threads();
+			cout << " threads=" << param_i.at("thread");
 		}
 		cout << endl << flush;
 	}
@@ -130,6 +130,8 @@ int eqtlbma_bf(
 					"maxbf"), itG_begin,
 				itG);
 		}
+		extractResSstats(subgroups, itG_begin, itG, snp2object, m_sstats,
+			m_snps);
 		// progress tracker
 		countGenes += step_size;
 		if (param_i.at("verbose") == 1)

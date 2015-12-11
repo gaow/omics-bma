@@ -245,3 +245,57 @@ void pyeqtlbma::makePermutations(
 }
 
 
+void pyeqtlbma::extractResSstats(
+                                 const vector<string> & subgroups,
+                                 const map<string, Gene>::iterator & itG_begin,
+                                 const map<string, Gene>::iterator & itG_end,
+                                 const map<string, Snp> & snp2object,
+                                 map<string,
+                                     map<string,
+                                         vector<vector<double> > > > & res_data,
+                                 map<string,
+                                     map<string,
+                                         vector<string > > > & res_snps)
+{
+
+	for (map<string, Gene>::const_iterator it_gene = itG_begin;
+	     it_gene != itG_end; ++it_gene) {
+		if (res_data.find(it_gene->second.GetName()) == res_data.end()) {
+			map<string, vector<vector<double> > >  tmp1_;
+			map<string, vector<string> >  tmp2_;
+			res_data[it_gene->second.GetName()] = tmp1_;
+			res_snps[it_gene->second.GetName()] = tmp2_;
+		}
+		for (size_t s = 0; s < subgroups.size(); ++s) {
+			if (!it_gene->second.HasAtLeastOneCisSnp(subgroups[s]))
+				continue;
+			if (res_data[it_gene->second.GetName()].find(subgroups[s]) ==
+			    res_data[it_gene->second.GetName()].end()) {
+				vector<vector<double> > tmp1_;
+				vector<string> tmp2_;
+				res_data[it_gene->second.GetName()][subgroups[s]] = tmp1_;
+				res_snps[it_gene->second.GetName()][subgroups[s]] = tmp2_;
+			}
+			for (vector<GeneSnpPair>::const_iterator it_pair
+			         = it_gene->second.BeginPair();
+			     it_pair != it_gene->second.EndPair(); ++it_pair) {
+				if (!it_pair->HasResults(subgroups[s]))
+					continue;
+				res_snps[it_gene->second.GetName()][subgroups[s]].push_back(
+					it_pair->GetSnpName());
+				vector<double> tmp_ { snp2object.find(it_pair->GetSnpName())->
+					                  second.GetMinorAlleleFreq(subgroups[s]),
+					                  (double)it_pair->GetSampleSize(
+										  subgroups[s]),
+					                  it_pair->GetPve(subgroups[s]),
+					                  it_pair->GetSigmahat(subgroups[s]),
+					                  it_pair->GetBetahatGeno(subgroups[s]),
+					                  it_pair->GetSebetahatGeno(subgroups[s]),
+					                  it_pair->GetBetapvalGeno(subgroups[s]) };
+				res_data[it_gene->second.GetName()][subgroups[s]].push_back(tmp_);
+			}   // end of loop over cis snps
+		}       // end of loop over subgroups
+	}           // end of loop over genes
+}
+
+

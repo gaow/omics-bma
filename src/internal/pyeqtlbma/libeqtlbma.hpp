@@ -126,6 +126,18 @@ void makePermutations(
 	std::map<std::string, quantgen::Gene>::iterator & itG_begin,
 	std::map<std::string, quantgen::Gene>::iterator & itG_end);
 
+void extractResSstats(
+	const std::vector<std::string> & subgroups,
+	const std::map<std::string, quantgen::Gene>::iterator & itG_begin,
+	const std::map<std::string, quantgen::Gene>::iterator & itG_end,
+	const std::map<std::string, quantgen::Snp> & snp2object,
+	std::map<std::string,
+	         std::map<std::string,
+	                  std::vector<std::vector<double> > > > & res_data,
+	std::map<std::string,
+	         std::map<std::string,
+	                  std::vector<std::string > > > & res_snps);
+
 }
 
 #endif
