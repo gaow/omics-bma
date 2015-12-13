@@ -120,11 +120,13 @@ public:
 		const dict_vectors & param_vs);
 
 	dict_dict_matrixf GetSstats() { return m_sstats; };
-	dict_dict_vectors GetSnps() { return m_snps; };
+	dict_dict_vectors GetSstatsRownames() { return m_sstats_rownames; };
 
 private:
 	dict_dict_matrixf m_sstats;
-	dict_dict_vectors m_snps;
+	dict_dict_vectors m_sstats_rownames;
+	dict_matrixf m_sep_perm_pvals;
+	dict_vectors m_sep_perm_pvals_rownames;
 };
 
 }

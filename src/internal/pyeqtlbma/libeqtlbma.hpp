@@ -138,6 +138,23 @@ void extractResSstats(
 	         std::map<std::string,
 	                  std::vector<std::string > > > & res_snps);
 
+
+void extractResSepPermPvalMultiGroup(
+	const std::map<std::string, quantgen::Gene>::iterator & itG_begin,
+	const std::map<std::string, quantgen::Gene>::iterator & itG_end,
+	const std::vector<std::string> & subgroups,
+	const size_t & seed,
+	std::map<std::string, std::vector<std::vector<double> > > & res_data,
+	std::map<std::string, std::vector<std::string> > & res_sbgrps
+    );
+
+void extractResSepPermPvalSingleGroup(
+	const std::map<std::string, quantgen::Gene>::iterator & itG_begin,
+	const std::map<std::string, quantgen::Gene>::iterator & itG_end,
+	const size_t & seed,
+	std::map<std::string, std::vector<std::vector<double> > > & res_data
+    );
+
 }
 
 #endif

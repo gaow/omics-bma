@@ -131,7 +131,10 @@ int eQtlBma::eqtlbma_bf(
 				itG);
 		}
 		extractResSstats(subgroups, itG_begin, itG, snp2object, m_sstats,
-			m_snps);
+			m_sstats_rownames);
+		extractResSepPermPvalMultiGroup(itG_begin, itG, subgroups, (size_t)param_i.at(
+				"seed"), m_sep_perm_pvals,
+			m_sep_perm_pvals_rownames);
 		// progress tracker
 		countGenes += step_size;
 		if (param_i.at("verbose") == 1)

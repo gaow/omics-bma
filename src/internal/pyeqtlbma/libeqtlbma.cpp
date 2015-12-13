@@ -299,3 +299,226 @@ void pyeqtlbma::extractResSstats(
 }
 
 
+void extractResSepPermPvalMultiGroup(
+                                     const map<string,
+                                               Gene>::iterator & itG_begin,
+                                     const map<string,
+                                               Gene>::iterator & itG_end,
+                                     const vector<string> & subgroups,
+                                     const size_t & seed,
+                                     map<string,
+                                         vector<vector<double> > > & res_data,
+                                     map<string, vector<string> > & res_sbgrps
+                                     )
+{
+	for (map<string, Gene>::const_iterator it_gene = itG_begin;
+	     it_gene != itG_end; ++it_gene) {
+		for (vector<string>::const_iterator it_sbgrp = subgroups.begin();
+		     it_sbgrp != subgroups.end(); ++it_sbgrp) {
+			if (it_gene->second.GetNbGeneSnpPairs() > 0) {
+				if (res_data.find(it_gene->second.GetName()) ==
+				    res_data.end()) {
+					vector<vector<double> > tmp1_;
+					vector<string> tmp2_;
+					res_data[it_gene->second.GetName()] = tmp1_;
+					res_sbgrps[it_gene->second.GetName()] = tmp2_;
+				}
+				vector<double> tmp_ { it_gene->second.GetNbGeneSnpPairs(
+										  *it_sbgrp),
+					                  it_gene->second.GetPermutationPvalueSep(
+										  *it_sbgrp),
+					                  it_gene->second.GetNbPermutationsSep(
+										  *it_sbgrp),
+					                  it_gene->second.GetTrueMinPval(*it_sbgrp) };
+				res_data[it_gene->second.GetName()].push_back(tmp_);
+				res_sbgrps[it_gene->second.GetName()].push_back(*it_sbgrp);
+			}
+		}
+	}
+}
+
+
+void extractResSepPermPvalSingleGroup(
+                                      const map<string,
+                                                Gene>::iterator & itG_begin,
+                                      const map<string,
+                                                Gene>::iterator & itG_end,
+                                      const size_t & seed,
+                                      map<string, vector<vector<double> > > & res_data
+                                      )
+{
+	for (map<string, Gene>::const_iterator it_gene = itG_begin;
+	     it_gene != itG_end; ++it_gene) {
+		if (it_gene->second.GetNbGeneSnpPairs() > 0) {
+			if (res_data.find(it_gene->second.GetName()) == res_data.end()) {
+				vector<vector<double> > tmp1_;
+				vector<string> tmp2_;
+				res_data[it_gene->second.GetName()] = tmp1_;
+			}
+			vector<double> tmp_ { it_gene->second.GetNbGeneSnpPairs(),
+				           it_gene->second.GetPermutationPvalueSep(),
+				           it_gene->second.GetNbPermutationsSep(),
+				           it_gene->second.GetTrueMinPval() };
+			res_data[it_gene->second.GetName()].push_back(tmp_);
+		}
+	}
+}
+
+
+void extractResAbfsRaw(
+                       const string & out_prefix,
+                       const map<string, Gene>::iterator & itG_begin,
+                       const map<string, Gene>::iterator & itG_end,
+                       const size_t & nb_subgroups,
+                       const Grid & iGridL,
+                       const Grid & iGridS,
+                       const PriorMatrices & iPriorM,
+                       const string & bfs,
+
+                       const string & header_opt)
+{
+	string sep = "\t";
+
+	gsl_combination * comb;
+	stringstream ssOutFile, ssConfig, ssTxt;
+
+	ssOutFile << out_prefix << "_l10abfs_raw.txt.gz";
+	gzFile outStream;
+	string file_mode;
+	if (header_opt == "none")
+		file_mode = "ab";
+	else
+		file_mode = "wb";
+	openFile(ssOutFile.str(), outStream, file_mode.c_str());
+	size_t nb_lines = 1;
+	if (header_opt != "none") {
+		// write header line
+		ssTxt << "gene" << sep << "snp" << sep << "config";
+		for (size_t i = 0; i < iGridL.size(); ++i)
+			ssTxt << sep << "l10abf.grid" << (i + 1);
+		ssTxt << endl;
+		gzwriteLine(outStream, ssTxt.str(), ssOutFile.str(), nb_lines);
+	}
+	if (header_opt == "only") {
+		closeFile(ssOutFile.str(), outStream);
+		return;
+	}
+
+	// write results
+	ssTxt.precision(6);
+	ssTxt.setf(ios::scientific);
+	for (map<string, Gene>::const_iterator it_gene = itG_begin;
+	     it_gene != itG_end; ++it_gene) {
+		for (vector<GeneSnpPair>::const_iterator it_pair
+		         = it_gene->second.BeginPair();
+		     it_pair != it_gene->second.EndPair();
+		     ++it_pair) {
+
+			// write gen BFs (large grid)
+			ssTxt.str("");
+			ssTxt	<< it_gene->first
+			        << sep << it_pair->GetSnpName()
+			        << sep << "gen";
+			for (vector<double>::const_iterator it
+			         = it_pair->BeginUnweightedAbf("gen");
+			     it != it_pair->EndUnweightedAbf("gen"); ++it)
+				ssTxt << sep << *it;
+			ssTxt << "\n";
+			++nb_lines;
+			gzwriteLine(outStream, ssTxt.str(), ssOutFile.str(), nb_lines);
+
+			// write gen-fix BFs (large grid)
+			ssTxt.str("");
+			ssTxt	<< it_gene->first
+			        << sep << it_pair->GetSnpName()
+			        << sep << "gen-fix";
+			for (vector<double>::const_iterator it
+			         = it_pair->BeginUnweightedAbf("gen-fix");
+			     it != it_pair->EndUnweightedAbf("gen-fix"); ++it)
+				ssTxt << sep << *it;
+			ssTxt << "\n";
+			++nb_lines;
+			gzwriteLine(outStream, ssTxt.str(), ssOutFile.str(), nb_lines);
+
+			// write gen-maxh BFs (large grid)
+			ssTxt.str("");
+			ssTxt	<< it_gene->first
+			        << sep << it_pair->GetSnpName()
+			        << sep << "gen-maxh";
+			for (vector<double>::const_iterator it
+			         = it_pair->BeginUnweightedAbf("gen-maxh");
+			     it != it_pair->EndUnweightedAbf("gen-maxh"); ++it)
+				ssTxt << sep << *it;
+			ssTxt << "\n";
+			++nb_lines;
+			gzwriteLine(outStream, ssTxt.str(), ssOutFile.str(), nb_lines);
+
+			// write the BFs for each config (small grid)
+			if (bfs != "gen") {
+				for (size_t k = 1; k <= nb_subgroups; ++k) {
+					comb = gsl_combination_calloc(nb_subgroups, k);
+					if (comb == NULL) {
+						cerr	<<
+						"ERROR: can't allocate memory for the combination"
+						        << endl;
+						exit(EXIT_FAILURE);
+					}
+					while (true) {
+						ssTxt.str("");
+						ssTxt	<< it_gene->first
+						        << sep << it_pair->GetSnpName();
+						ssConfig.str("");
+						ssConfig << gsl_combination_get(comb, 0) + 1;
+						if (comb->k > 1)
+							for (size_t i = 1; i < k; ++i)
+								ssConfig << "-" <<
+								gsl_combination_get(comb, i) + 1;
+						ssTxt << sep << ssConfig.str();
+						for (size_t j = 0; j < iGridL.size(); ++j) {
+							if (j < iGridS.size())
+								ssTxt << sep <<
+								*(it_pair->BeginUnweightedAbf(ssConfig.str()) +
+								  j);
+							else
+								ssTxt << sep << NaN;
+						}
+						ssTxt << "\n";
+						++nb_lines;
+						gzwriteLine(outStream, ssTxt.str(),
+							ssOutFile.str(),
+							nb_lines);
+						if (gsl_combination_next(comb) != GSL_SUCCESS)
+							break;
+					}
+					gsl_combination_free(comb);
+					if (bfs == "sin" || bfs == "customized")
+						break;
+				}
+			}
+			// write the BFs for each customized prior (with customized grid)
+			if (bfs == "customized") {
+				for (size_t m = 0; m < iPriorM.Wg_names.size(); ++m) {
+					ssTxt.str("");
+					ssTxt	<< it_gene->first
+					        << sep << it_pair->GetSnpName();
+					ssTxt << sep << iPriorM.Wg_names[m];
+					for (size_t j = 0; j < iGridL.size(); ++j) {
+						if (j < iPriorM.Wg_scalars.size())
+							ssTxt << sep <<
+							*(it_pair->BeginUnweightedAbf(iPriorM.Wg_names[m]) +
+							  j);
+						else
+							ssTxt << sep << NaN;
+					}
+					ssTxt << "\n";
+					++nb_lines;
+					gzwriteLine(outStream, ssTxt.str(),
+						ssOutFile.str(),
+						nb_lines);
+				}
+			}
+		}
+	}
+}
+
+
