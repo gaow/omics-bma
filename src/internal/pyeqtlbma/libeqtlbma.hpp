@@ -21,6 +21,7 @@
 #include <numeric>
 
 #include <gsl/gsl_rng.h>
+#include <gsl/gsl_combination.h>
 #include <omp.h>
 
 #include "utils/utils_io.hpp"

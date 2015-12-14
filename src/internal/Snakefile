@@ -6,17 +6,17 @@ rule help:
   shell: "snakemake -l"
 
 rule gsl:
-  output: "../../external/gsl/config.log"
-  shell: '''cd ../../external/gsl; ./configure CFLAGS="-O3 -fPIC" --prefix=`pwd`; make; make install; cd -'''
+  output: "../external/gsl/config.log"
+  shell: '''cd ../external/gsl; ./configure CFLAGS="-O3 -fPIC" --prefix=`pwd`; make; make install; cd -'''
 
 rule swig:
   input:
-    h = "pyeqtlbma.hpp",
-    c = "pyeqtlbma.cpp",
-    i = "pyeqtlbma.i",
+    h = "pyeqtlbma/pyeqtlbma.hpp",
+    c = "pyeqtlbma/pyeqtlbma.cpp",
+    i = "pyeqtlbma/pyeqtlbma.i",
   output:
-    cxx = "pyeqtlbma_wrap.cxx",
-    py = "pyeqtlbma.py"
+    cxx = "pyeqtlbma/pyeqtlbma_wrap.cxx",
+    py = "pyeqtlbma/pyeqtlbma.py"
   params:
     swig_opts = "-c++ -python -O -shadow -keyword -w-511 -w-509"
   shell:
@@ -31,7 +31,7 @@ rule install:
   shell: "python setup.py install"
 
 rule test:
-  shell: "python example.py"
+  shell: "echo TODO ..."
 
 rule clean:
   shell: "rm -rf build.done dist *.egg-info"

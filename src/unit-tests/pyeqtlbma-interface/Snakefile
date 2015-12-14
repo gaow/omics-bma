@@ -1,30 +1,13 @@
 from OmicsBMA.pyeqtlbma import *
+from OmicsBMA.core import *
 configfile: "config.yaml"
 
 rule bf:
   threads: config['thread']
   run:
-    param_i = {}
-    param_s = {}
-    param_f = {}
-    param_vs = {}
     sstats = {'dat':{'dat':[[]]}}
-    for k, val in list(config.items()):
-        if type(val) == str:
-            param_s[k] = val
-        elif type(val) == float:
-            param_f[k] = val
-        elif type(val) == list:
-            param_vs[k] = val
-        elif type(val) == int:
-            param_i[k] = val
-        else:
-            pass
+    params = Py2Swig("dict").convert(config)
     exe = eQtlBma()
-    exe.eqtlbma_bf(param_s, param_i, param_f, sstats, param_vs)
-    res = {}
-    for k,val in list(dict(exe.GetSstats()).items()):
-        res[k] = {}
-        for k2, val2 in list(dict(val).items()):
-            res[k][k2] = list(val2)
+    exe.eqtlbma_bf(params["string"], params["int"], params["float"], sstats, params["vectors"])
+    res = Swig2Py("ddm").convert(exe.GetSstats())
     print(res)
