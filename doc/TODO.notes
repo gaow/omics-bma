@@ -2,4 +2,7 @@
 #! TODO
 ###
 #{list
+# Fix the temporary patch that links @@__init__.py@@ to @@pyeqtlbma.py@@ for package import.
+# Fix Issue 2 the bf bug
+# Fix Issues 3 and 4 the exception handling
 #}
