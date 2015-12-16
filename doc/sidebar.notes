@@ -12,6 +12,11 @@
 #}
 #{list
 # ""[Tutorials|@tutorials@]""
+## [Building support databases|@tutorials/data-processing@]
+## [Choice of priors|@tutorials/priors@]
+## [Association testing|@tutorials/association-testing@]
+## [Assumptions on eQTLs within a gene|@tutorials/eqtl-assumptions@]
+## [Bayes Model Averaging|@tutorials/averaging@]
 #}
 #{list
 # ""[Applications|@applications@]""
@@ -19,6 +24,13 @@
 #}
 #{list
 # ""[User Manual|@manual/start@]""
+## [generate-blocks|@manual/generate-blocks@]
+## [make-prior|@manual/make-prior@]
+## [test-for-association|@manual/test-for-association@]
+## [consolidate-tests|@manual/consolidate-tests@]
+## [fit-mixture-model|@manual/fit-mixture-model@]
+## [bayesian-inference|@manual/bayesian-inference@]
+## [visualization|@manual/visualization@]
 #}
 #{list
 # ""[For Developers|@development/start@]""

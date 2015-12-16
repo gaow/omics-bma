@@ -156,6 +156,18 @@ void extractResSepPermPvalSingleGroup(
 	std::map<std::string, std::vector<std::vector<double> > > & res_data
     );
 
+void extractResAbfsRaw(
+	const std::map<std::string, quantgen::Gene>::iterator & itG_begin,
+	const std::map<std::string, quantgen::Gene>::iterator & itG_end,
+	const size_t & nb_subgroups,
+	const quantgen::Grid & iGridL,
+	const quantgen::Grid & iGridS,
+	const quantgen::PriorMatrices & iPriorM,
+	const std::string & bfs,
+	std::map<std::string, std::vector<std::vector<double> > > & res_data,
+	std::map<std::string, std::vector<std::string> > & res_names
+    );
+
 }
 
 #endif
