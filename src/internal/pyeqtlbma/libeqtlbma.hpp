@@ -168,6 +168,15 @@ void extractResAbfs(
 	std::map<std::string, std::vector<std::string> > & res_names
     );
 
+void extractResJoinPermPval(
+	const std::map<std::string, quantgen::Gene>::iterator & itG_begin,
+	const std::map<std::string, quantgen::Gene>::iterator & itG_end,
+	const size_t & seed,
+	const std::string & permbf,
+	const bool & use_max_bf,
+	std::vector<std::vector<double> > & res_data,
+	std::vector<std::string> & res_names
+    );
 
 }
 

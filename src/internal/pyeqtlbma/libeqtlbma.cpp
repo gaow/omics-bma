@@ -359,24 +359,25 @@ void extractResSepPermPvalSingleGroup(
 	}
 }
 
+
 // this function combines writeResAbfsRaw and writeResAbfsAvgGrids
 void extractResAbfs(
-                       const map<string, Gene>::iterator & itG_begin,
-                       const map<string, Gene>::iterator & itG_end,
-                       const size_t & nb_subgroups,
-                       const Grid & iGridL,
-                       const Grid & iGridS,
-                       const PriorMatrices & iPriorM,
-                       const string & bfs,
-                       map<string, vector<vector<double> > > & res_data,
-                       map<string, vector<string> > & res_names
-                       )
+                    const map<string, Gene>::iterator & itG_begin,
+                    const map<string, Gene>::iterator & itG_end,
+                    const size_t & nb_subgroups,
+                    const Grid & iGridL,
+                    const Grid & iGridS,
+                    const PriorMatrices & iPriorM,
+                    const string & bfs,
+                    map<string, vector<vector<double> > > & res_data,
+                    map<string, vector<string> > & res_names
+                    )
 {
 	stringstream ssConfig;
 	gsl_combination * comb;
 	bool colnames_saved = false;
 
-	res_names["colnames"] = {"nb_groups"};
+	res_names["colnames"] = { "nb_groups" };
 
 	// write results
 	for (map<string, Gene>::const_iterator it_gene = itG_begin;
@@ -391,7 +392,7 @@ void extractResAbfs(
 				res_names[it_gene->second.GetName()] = {};
 			}
 			res_names[it_gene->second.GetName()].push_back(it_pair->GetSnpName());
-			vector<double> tmp_{(double) it_pair->GetNbSubgroups()};
+			vector<double> tmp_ { (double)it_pair->GetNbSubgroups() };
 
 			// write gen BFs (large grid)
 			if (!colnames_saved) {
@@ -426,21 +427,32 @@ void extractResAbfs(
 			     it != it_pair->EndUnweightedAbf("gen-maxh"); ++it)
 				tmp_.push_back(*it);
 
-      // write averaged gen, gen-fix, gen-maxh BFs
+			// write averaged gen, gen-fix, gen-maxh BFs
 			if (!colnames_saved) {
-        res_names["colnames"].push_back("gen.avg");
-        res_names["colnames"].push_back("gen-fix.avg");
-        res_names["colnames"].push_back("gen-maxh.avg");
-        if (bfs == "sin" || bfs == "all" || bfs == "customized") res_names["colnames"].push_back("gen-sin.avg");
-        if (bfs == "all") res_names["colnames"].push_back("all.avg");
-        if (bfs == "customized") res_names["colnames"].push_back("customized.avg");
+				res_names["colnames"].push_back("gen.avg");
+				res_names["colnames"].push_back("gen-fix.avg");
+				res_names["colnames"].push_back("gen-maxh.avg");
+				if (bfs == "sin" || bfs == "all" ||
+				    bfs == "customized") res_names["colnames"].push_back(
+						"gen-sin.avg");
+
+				if (bfs == "all") res_names["colnames"].push_back("all.avg");
+				if (bfs == "customized") res_names["colnames"].push_back(
+						"customized.avg");
+
 			}
-      tmp_.push_back(it_pair->GetWeightedAbf("gen"));
-      tmp_.push_back(it_pair->GetWeightedAbf("gen-fix"));
-      tmp_.push_back(it_pair->GetWeightedAbf("gen-maxh"));
-      if (bfs == "sin" || bfs == "all" || bfs == "customized") tmp_.push_back(it_pair->GetWeightedAbf("gen-sin"));
-      if (bfs == "all") tmp_.push_back(it_pair->GetWeightedAbf("all"));
-      if (bfs == "customized") tmp_.push_back(it_pair->GetWeightedAbf("customized"));
+			tmp_.push_back(it_pair->GetWeightedAbf("gen"));
+			tmp_.push_back(it_pair->GetWeightedAbf("gen-fix"));
+			tmp_.push_back(it_pair->GetWeightedAbf("gen-maxh"));
+			if (bfs == "sin" || bfs == "all" ||
+			    bfs ==
+			    "customized") tmp_.push_back(it_pair->GetWeightedAbf("gen-sin"));
+
+			if (bfs == "all") tmp_.push_back(it_pair->GetWeightedAbf("all"));
+			if (bfs ==
+			    "customized") tmp_.push_back(it_pair->GetWeightedAbf(
+						"customized"));
+
 
 			// write the BFs for each config (small grid)
 			if (bfs != "gen") {
@@ -461,7 +473,7 @@ void extractResAbfs(
 									ssConfig << "-" <<
 									    gsl_combination_get(comb, i) + 1;
 						}
-            // write individual BFs
+						// write individual BFs
 						for (size_t j = 0; j < iGridS.size(); ++j) {
 							if (!colnames_saved) {
 								res_names["colnames"].push_back(
@@ -471,9 +483,11 @@ void extractResAbfs(
 							tmp_.push_back(*(it_pair->BeginUnweightedAbf(
 												 ssConfig.str()) + j));
 						}
-            // write avg BFs
-            if (!colnames_saved) res_names["colnames"].push_back(ssConfig.str() + ".avg");
-            tmp_.push_back(it_pair->GetWeightedAbf(ssConfig.str()));
+						// write avg BFs
+						if (!colnames_saved) res_names["colnames"].push_back(
+								ssConfig.str() +
+								".avg");
+						tmp_.push_back(it_pair->GetWeightedAbf(ssConfig.str()));
 						if (gsl_combination_next(comb) != GSL_SUCCESS)
 							break;
 					}
@@ -485,7 +499,7 @@ void extractResAbfs(
 			// write the BFs for each customized prior (with customized grid)
 			if (bfs == "customized") {
 				for (size_t m = 0; m < iPriorM.Wg_names.size(); ++m) {
-          // write indiviual BFs
+					// write indiviual BFs
 					for (size_t j = 0; j < iPriorM.Wg_scalars.size(); ++j) {
 						if (!colnames_saved) {
 							res_names["colnames"].push_back(iPriorM.Wg_names[m] + "." + to_string(
@@ -494,14 +508,43 @@ void extractResAbfs(
 						tmp_.push_back(*(it_pair->BeginUnweightedAbf(iPriorM.
 											 Wg_names[m]) + j));
 					}
-          // write average BFs
-						if (!colnames_saved) res_names["colnames"].push_back(iPriorM.Wg_names[m] + ".avg");
-            tmp_.push_back(it_pair->GetWeightedAbf(iPriorM.Wg_names[m]));
+					// write average BFs
+					if (!colnames_saved) res_names["colnames"].push_back(
+							iPriorM.Wg_names[
+							    m] + ".avg");
+					tmp_.push_back(it_pair->GetWeightedAbf(iPriorM.Wg_names[m]));
 				}
 			}
-      // collect results data
+			// collect results data
 			res_data[it_gene->second.GetName()].push_back(tmp_);
 			if (!colnames_saved) colnames_saved = true;
+		}
+	}
+}
+
+
+void extractResJoinPermPval(
+                            const map<string, Gene>::iterator & itG_begin,
+                            const map<string, Gene>::iterator & itG_end,
+                            const size_t & seed,
+                            const string & permbf,
+                            const bool & use_max_bf,
+                            vector<vector<double> > & res_data,
+                            vector<string> & res_names
+                            )
+{
+
+	for (map<string, Gene>::const_iterator it_gene = itG_begin;
+	     it_gene != itG_end; ++it_gene) {
+		if (it_gene->second.GetNbGeneSnpPairs() > 0) {
+			res_names.push_back(it_gene->second.GetName());
+			vector<double> tmp_ = { (double)it_gene->second.GetNbGeneSnpPairs(),
+				                    (double)it_gene->second.
+				                    GetPermutationPvalueJoin(),
+				                    (double)it_gene->second.
+				                    GetNbPermutationsJoin(),
+				                    it_gene->second.GetTrueL10Abf(use_max_bf),
+				                    it_gene->second.GetMedianPermL10Abf() };
 		}
 	}
 }
