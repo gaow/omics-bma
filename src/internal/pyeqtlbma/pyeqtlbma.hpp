@@ -129,8 +129,8 @@ private:
 	dict_vectors m_sep_perm_pvals_rownames;
 	matrixf m_join_perm_pvals;
 	vectors m_join_perm_pvals_rownames;
-  dict_matrixf m_abfs;
-  dict_vectors m_abfs_names;
+	dict_matrixf m_abfs;
+	dict_vectors m_abfs_names;
 };
 
 }

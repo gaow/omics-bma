@@ -297,17 +297,17 @@ void pyeqtlbma::extractResSstats(
 }
 
 
-void extractResSepPermPvalMultiGroup(
-                                     const map<string,
-                                               Gene>::iterator & itG_begin,
-                                     const map<string,
-                                               Gene>::iterator & itG_end,
-                                     const vector<string> & subgroups,
-                                     const size_t & seed,
-                                     map<string,
-                                         vector<vector<double> > > & res_data,
-                                     map<string, vector<string> > & res_sbgrps
-                                     )
+void pyeqtlbma::extractResSepPermPvalMultiGroup(
+                                                const map<string,
+                                                          Gene>::iterator & itG_begin,
+                                                const map<string,
+                                                          Gene>::iterator & itG_end,
+                                                const vector<string> & subgroups,
+                                                const size_t & seed,
+                                                map<string,
+                                                    vector<vector<double> > > & res_data,
+                                                map<string, vector<string> > & res_sbgrps
+                                                )
 {
 	for (map<string, Gene>::const_iterator it_gene = itG_begin;
 	     it_gene != itG_end; ++it_gene) {
@@ -335,14 +335,14 @@ void extractResSepPermPvalMultiGroup(
 }
 
 
-void extractResSepPermPvalSingleGroup(
-                                      const map<string,
-                                                Gene>::iterator & itG_begin,
-                                      const map<string,
-                                                Gene>::iterator & itG_end,
-                                      const size_t & seed,
-                                      map<string, vector<vector<double> > > & res_data
-                                      )
+void pyeqtlbma::extractResSepPermPvalSingleGroup(
+                                                 const map<string,
+                                                           Gene>::iterator & itG_begin,
+                                                 const map<string,
+                                                           Gene>::iterator & itG_end,
+                                                 const size_t & seed,
+                                                 map<string, vector<vector<double> > > & res_data
+                                                 )
 {
 	for (map<string, Gene>::const_iterator it_gene = itG_begin;
 	     it_gene != itG_end; ++it_gene) {
@@ -361,17 +361,17 @@ void extractResSepPermPvalSingleGroup(
 
 
 // this function combines writeResAbfsRaw and writeResAbfsAvgGrids
-void extractResAbfs(
-                    const map<string, Gene>::iterator & itG_begin,
-                    const map<string, Gene>::iterator & itG_end,
-                    const size_t & nb_subgroups,
-                    const Grid & iGridL,
-                    const Grid & iGridS,
-                    const PriorMatrices & iPriorM,
-                    const string & bfs,
-                    map<string, vector<vector<double> > > & res_data,
-                    map<string, vector<string> > & res_names
-                    )
+void pyeqtlbma::extractResAbfs(
+                               const map<string, Gene>::iterator & itG_begin,
+                               const map<string, Gene>::iterator & itG_end,
+                               const size_t & nb_subgroups,
+                               const Grid & iGridL,
+                               const Grid & iGridS,
+                               const PriorMatrices & iPriorM,
+                               const string & bfs,
+                               map<string, vector<vector<double> > > & res_data,
+                               map<string, vector<string> > & res_names
+                               )
 {
 	stringstream ssConfig;
 	gsl_combination * comb;
@@ -448,6 +448,8 @@ void extractResAbfs(
 			    bfs ==
 			    "customized") tmp_.push_back(it_pair->GetWeightedAbf("gen-sin"));
 
+
+
 			if (bfs == "all") tmp_.push_back(it_pair->GetWeightedAbf("all"));
 			if (bfs ==
 			    "customized") tmp_.push_back(it_pair->GetWeightedAbf(
@@ -523,15 +525,17 @@ void extractResAbfs(
 }
 
 
-void extractResJoinPermPval(
-                            const map<string, Gene>::iterator & itG_begin,
-                            const map<string, Gene>::iterator & itG_end,
-                            const size_t & seed,
-                            const string & permbf,
-                            const bool & use_max_bf,
-                            vector<vector<double> > & res_data,
-                            vector<string> & res_names
-                            )
+void pyeqtlbma::extractResJoinPermPval(
+                                       const map<string,
+                                                 Gene>::iterator & itG_begin,
+                                       const map<string,
+                                                 Gene>::iterator & itG_end,
+                                       const size_t & seed,
+                                       const string & permbf,
+                                       const bool & use_max_bf,
+                                       vector<vector<double> > & res_data,
+                                       vector<string> & res_names
+                                       )
 {
 
 	for (map<string, Gene>::const_iterator it_gene = itG_begin;
@@ -548,3 +552,5 @@ void extractResJoinPermPval(
 		}
 	}
 }
+
+

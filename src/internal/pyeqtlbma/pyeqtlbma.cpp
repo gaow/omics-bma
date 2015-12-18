@@ -131,32 +131,39 @@ int eQtlBma::eqtlbma_bf(
 				itG);
 		}
 
-    // write results
-    // FIXME: sstat empty
-    if(param_s.at("analys") == "sep" ||
-       (param_s.at("analys") == "join" && 1 &&
-        param_s.at("error") != "mvlr"))
-		extractResSstats(subgroups, itG_begin, itG, snp2object, m_sstats,
-			m_sstats_rownames);
+		// write results
+		// FIXME: sstat empty
+		if (param_s.at("analys") == "sep" ||
+		    (param_s.at("analys") == "join" && 1 &&
+		     param_s.at("error") != "mvlr"))
+			extractResSstats(subgroups, itG_begin, itG, snp2object, m_sstats,
+				m_sstats_rownames);
 
-  if( param_s.at("analys") == "sep" && param_i.at("nperm") > 0 &&
-     param_i.at("permsep") != 0){
-    if(param_i.at("permsep") == 1)
-      extractResSepPermPvalSingleGroup(itG_begin, itG, (size_t)param_i.at(
-				"seed"), m_sep_perm_pvals);
-    else if(param_i.at("permsep") == 2)
-      extractResSepPermPvalMultiGroup(itG_begin, itG, subgroups, (size_t)param_i.at(
-				"seed"), m_sep_perm_pvals, m_sep_perm_pvals_rownames);
-  }
+		if (param_s.at("analys") == "sep" && param_i.at("nperm") > 0 &&
+		    param_i.at("permsep") != 0) {
+			if (param_i.at("permsep") == 1)
+				extractResSepPermPvalSingleGroup(itG_begin, itG, (size_t)param_i.at(
+						"seed"), m_sep_perm_pvals);
+			else if (param_i.at("permsep") == 2)
+				extractResSepPermPvalMultiGroup(itG_begin, itG, subgroups,
+					(size_t)param_i.at(
+						"seed"), m_sep_perm_pvals, m_sep_perm_pvals_rownames);
+		}
 
 
-  if(param_s.at("analys") == "join"){
-    extractResAbfs(itG_begin, itG, subgroups.size(),
-                   iGridL, iGridS, iPriorM, param_s.at("bfs"), m_abfs, m_abfs_names);
-    }
+		if (param_s.at("analys") == "join") {
+			extractResAbfs(itG_begin, itG, subgroups.size(),
+				iGridL, iGridS, iPriorM, param_s.at("bfs"), m_abfs,
+				m_abfs_names);
+		}
 
-  if(param_s.at("analys") == "join" && param_i.at("nperm") > 0)
-    extractResJoinPermPval(itG_begin, itG, (size_t)param_i.at("seed"), param_s.at("pbf"), (bool)param_i.at("maxbf"), m_join_perm_pvals, m_join_perm_pvals_rownames);
+		if (param_s.at("analys") == "join" && param_i.at("nperm") > 0)
+			extractResJoinPermPval(itG_begin, itG, (size_t)param_i.at(
+					"seed"),
+				param_s.at("pbf"),
+				(bool)param_i.at(
+					"maxbf"), m_join_perm_pvals,
+				m_join_perm_pvals_rownames);
 
 		// progress tracker
 		countGenes += step_size;
