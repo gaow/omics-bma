@@ -121,6 +121,12 @@ public:
 
 	dict_dict_matrixf GetSstats() { return m_sstats; };
 	dict_dict_vectors GetSstatsRownames() { return m_sstats_rownames; };
+	dict_matrixf GetSepPermPvals() { return m_sep_perm_pvals; }
+	dict_vectors GetSepPermPvalsRownames() { return m_sep_perm_pvals_rownames; }
+	matrixf GetJoinPermPvals() { return m_join_perm_pvals; }
+	vectors GetJoinPermPvalsRownames(){ return m_join_perm_pvals_rownames; }
+	dict_matrixf GetAbfs() { return m_abfs; }
+	dict_vectors GetAbfsNames() { return m_abfs_names; }
 
 private:
 	dict_dict_matrixf m_sstats;
