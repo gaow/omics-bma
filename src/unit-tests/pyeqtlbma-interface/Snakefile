@@ -6,8 +6,8 @@ rule bf:
   threads: config['thread']
   run:
     sstats = {'dat':{'dat':[[]]}}
-    params = Py2Swig("dict").convert(config)
+    params = convert_data(config, "dict")
     exe = eQtlBma()
     exe.eqtlbma_bf(params["string"], params["int"], params["float"], sstats, params["vectors"])
-    res = Swig2Py("ddm").convert(exe.GetSstats())
+    res = convert_data(exe.GetSstats(), "ddm")
     print(res)

@@ -2,6 +2,14 @@
 # core.py
 # Gao Wang (c) 2015
 
+def convert_data(data, to_obj):
+    if type(data) in (dict, list, tuple):
+        return Py2Swig(to_obj).convert(data)
+    elif type(data) in (str, int, float):
+        return data
+    else:
+        return Swig2Py(to_obj).convert(data)
+
 class Swig2Py(object):
     '''
     Convert data from SWIG objects to Python objects
@@ -10,7 +18,7 @@ class Swig2Py(object):
         if data_type == "ddm":
             self.convert = self.get_dict_dict_matrix
         else:
-            raise ValueError("Unknown data type")
+            raise ValueError("Unknown data type {}".format(data_type))
 
     def get_dict_dict_matrix(self, value):
         res = {}
