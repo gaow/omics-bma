@@ -6,8 +6,16 @@ rule bf:
   threads: config['thread']
   run:
     sstats = {'dat':{'dat':[[]]}}
-    params = convert_data(config, "dict")
+    params = convert_data(config)
     exe = eQtlBma()
     exe.eqtlbma_bf(params["string"], params["int"], params["float"], sstats, params["vectors"])
-    res = convert_data(exe.GetSstats(), "ddm")
+    res = (convert_data(exe.GetSstats(), "ddm"),
+           convert_data(exe.GetSstatsRownames(), "ddm"),
+           convert_data(exe.GetSepPermPvals(), "dm"),
+           convert_data(exe.GetSepPermPvalsRownames(), "dm"),
+           exe.GetJoinPermPvals(),
+           exe.GetJoinPermPvalsRownames(),
+           convert_data(exe.GetAbfs(), "dm"),
+           convert_data(exe.GetAbfsNames(), "dm")
+           )
     print(res)

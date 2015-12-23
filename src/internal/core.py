@@ -2,21 +2,23 @@
 # core.py
 # Gao Wang (c) 2015
 
-def convert_data(data, to_obj):
-    if type(data) in (dict, list, tuple):
-        return Py2Swig(to_obj).convert(data)
-    elif type(data) in (str, int, float):
-        return data
+def convert_data(data, to_obj = None):
+    if to_obj is not None:
+        return Map2Dict(to_obj).convert(data)
+    elif type(data) == dict:
+        return Dict2Map().convert(data)
     else:
-        return Swig2Py(to_obj).convert(data)
+        return data
 
-class Swig2Py(object):
+class Map2Dict(object):
     '''
-    Convert data from SWIG objects to Python objects
+    Convert data from SWIG map objects to Python dict objects
     '''
     def __init__(self, data_type):
         if data_type == "ddm":
             self.convert = self.get_dict_dict_matrix
+        elif data_type == "dm":
+            self.convert = self.get_dict_matrix
         else:
             raise ValueError("Unknown data type {}".format(data_type))
 
@@ -28,15 +30,20 @@ class Swig2Py(object):
                 res[k1][k2] = list(val2)
         return res
 
-class Py2Swig(object):
-    '''
-    Convert data from Python objects to SWIG interface compatible objects
-    '''
-    def __init__(self, data_type):
-        if data_type == "dict":
-            self.convert = self.get_dict
+    def get_dict_matrix(self, value):
+        res = {}
+        for k1, val1 in list(dict(value).items()):
+            res[k1] = list(val1)
+        return res
 
-    def get_dict(self, value):
+class Dict2Map(object):
+    '''
+    Convert data from Python heterogeneous dict to SWIG homogeneous map objects
+    '''
+    def __init__(self):
+        pass
+
+    def convert(self, value):
         params = {}
         for item in ["string", "float", "int", "vectors", "vectorf", "vectori", "dict"]:
             params[item] = {}
