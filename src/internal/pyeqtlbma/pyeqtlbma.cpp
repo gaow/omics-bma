@@ -17,8 +17,8 @@ int eQtlBma::eqtlbma_bf(
                         const dict_string & param_s,
                         const dict_int & param_i,
                         const dict_float & param_f,
-                        const dict_dict_matrixf & sstats,
-                        const dict_vectors & param_vs
+                        const dict_vectors & param_vs,
+                        const dict_dict_matrixf & sstats
                         )
 {
 	set<string> sSnpsToKeep;
@@ -35,8 +35,7 @@ int eQtlBma::eqtlbma_bf(
 	Covariates covariates;
 	map<string, Gene> gene2object;
 
-	// FIXME if(sstats.empty())
-	if (1)
+	if (sstats.begin()->first.empty())
 		loadRawInputData(param_s.at("geno"), param_s.at("scoord"),
 			param_s.at("exp"),
 			param_s.at("gcoord"), param_s.at("anchor"), (size_t)param_i.at(
@@ -77,8 +76,7 @@ int eQtlBma::eqtlbma_bf(
 		        << " error_model=" << param_s.at("error");
 		if (param_s.at("error") != "uvlr") // i.e. if 'mvlr' or 'hybrid'
 			cout << " prop_cov_errors=" << param_f.at("fiterr");
-		// FIXME sstats.empty()
-		if (1)
+		if (sstats.begin()->first.empty())
 			cout << " anchor=" << param_s.at("anchor") << " radius=" <<
 			    param_i.at("cis");
 		if (is_perm) {
@@ -107,8 +105,8 @@ int eQtlBma::eqtlbma_bf(
 		size_t step_size = min((int)distance(itG, gene2object.end()),
 			param_i.at("wrtsize"));
 		advance(itG, step_size);
-		// FIXME sstats.empty()
-		testForAssociations(1, mChr2VecPtSnps, param_s.at(
+		testForAssociations(
+			sstats.begin()->first.empty(), mChr2VecPtSnps, param_s.at(
 				"anchor"),
 			(size_t)param_i.at("cis"),
 			subgroups, samples, param_s.at("lik"), param_s.at("analys"),

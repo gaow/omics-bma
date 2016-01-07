@@ -3,12 +3,14 @@ from OmicsBMA.core import *
 configfile: "config.yaml"
 
 rule bf:
-  threads: config['thread']
+  threads:
+    config['thread']
   run:
-    sstats = {'dat':{'dat':[[]]}}
+    sstats = None
     params = convert_data(config)
     exe = eQtlBma()
-    exe.eqtlbma_bf(params["string"], params["int"], params["float"], sstats, params["vectors"])
+    exe.eqtlbma_bf(params["string"], params["int"], params["float"], params["vectors"],
+                   {'':{'':[[]]}} if sstats is None else sstats)
     res = (convert_data(exe.GetSstats(), "ddm"),
            convert_data(exe.GetSstatsRownames(), "ddm"),
            convert_data(exe.GetSepPermPvals(), "dm"),
