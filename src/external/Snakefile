@@ -1,5 +1,5 @@
 GSL_VERSION = "1.16"
-SM_VERSION = "3.5.2"
+SM_VERSION = "3.5.4"
 
 rule all:
   input: "eqtlbma", "gsl", "snakemake", "deepdish"
@@ -21,17 +21,17 @@ rule gsl:
     '''
 
 rule snakemake:
-  params: url = "https://bitbucket.org/snakemake/snakemake/get/v{0}.zip".format(SM_VERSION)
+  params: url = "https://pypi.python.org/packages/source/s/snakemake/snakemake-{0}.tar.gz".format(SM_VERSION)
   output: "snakemake"
   shell:
     '''
-    rm -rf v{SM_VERSION}.zip {output}
+    rm -rf snakemake-{SM_VERSION}.zip {output}
     wget {params.url}
-    unzip v{SM_VERSION}.zip
-    mv *{output}* {output}
+    tar zxvf snakemake-{SM_VERSION}.tar.gz
+    mv snakemake-{SM_VERSION} {output}
     '''
 
 rule deepdish:
-  params: url = "https://github.com/uchicago-cs/deepdish.git"
+  params: url = "https://github.com/gaow/deepdish.git"
   output: "deepdish"
   shell: "git clone {params.url}"

@@ -59,12 +59,7 @@ int eQtlBma::eqtlbma_bf(
 	PriorMatrices iPriorM(param_s.at("priorM"), param_s.at("gridM"),
 	                      subgroups.size(),
 	                      param_i.at("verbose"));
-	if (iPriorM.Wg_scalars.size() > iGridL.size()) {
-		cerr	<<
-		    "WARNING: gridM is larger than gridL; thus will be truncated to the size of gridL"
-		        << endl;
-	}
-
+  //
 	size_t countGenes = 0;
 	size_t totalGenes = gene2object.size();
 	bool is_perm = param_i.at("nperm") > 0 &&

@@ -548,8 +548,7 @@ void pyeqtlbma::extractResJoinPermPval(
 				                    GetNbPermutationsJoin(),
 				                    it_gene->second.GetTrueL10Abf(use_max_bf),
 				                    it_gene->second.GetMedianPermL10Abf() };
+      res_data.push_back(tmp_);
 		}
 	}
 }
-
-
