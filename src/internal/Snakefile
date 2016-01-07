@@ -1,5 +1,7 @@
 __doc__ = '''
 setup file for pyeqtlbma
+Note:
+- for rules gsl and deepdish, to update the installation, the corresponding log files have to be removed before rebuilt
 '''
 
 rule help:
@@ -22,10 +24,16 @@ rule swig:
   shell:
     "swig {params.swig_opts} -o {output.cxx} {input.i}"
 
+rule deepdish:
+  input: "../external/deepdish/setup.py"
+  output: "../external/deepdish/deepdish.log"
+  shell: "cd ../external/deepdish; python setup.py install > deepdish.log; cd -"
+
 rule install:
   input:
     rules.gsl.output,
-    rules.swig.output
+    rules.swig.output,
+    rules.deepdish.output
   output:
     touch("build.done")
   shell: "python setup.py install"

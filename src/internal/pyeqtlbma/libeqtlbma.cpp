@@ -479,7 +479,7 @@ void pyeqtlbma::extractResAbfs(
 						for (size_t j = 0; j < iGridS.size(); ++j) {
 							if (!colnames_saved) {
 								res_names["colnames"].push_back(
-									ssConfig.str() + "." +
+									"cfg." + ssConfig.str() + "." +
 									to_string(j + 1));
 							}
 							tmp_.push_back(*(it_pair->BeginUnweightedAbf(
@@ -487,8 +487,7 @@ void pyeqtlbma::extractResAbfs(
 						}
 						// write avg BFs
 						if (!colnames_saved) res_names["colnames"].push_back(
-								ssConfig.str() +
-								".avg");
+								"cfg." + ssConfig.str() + ".avg");
 						tmp_.push_back(it_pair->GetWeightedAbf(ssConfig.str()));
 						if (gsl_combination_next(comb) != GSL_SUCCESS)
 							break;

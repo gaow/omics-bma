@@ -130,9 +130,8 @@ int eQtlBma::eqtlbma_bf(
 		}
 
 		// write results
-		// FIXME: sstat empty
 		if (param_s.at("analys") == "sep" ||
-		    (param_s.at("analys") == "join" && 1 &&
+		    (param_s.at("analys") == "join" && sstats.begin()->first.empty() &&
 		     param_s.at("error") != "mvlr"))
 			extractResSstats(subgroups, itG_begin, itG, snp2object, m_sstats,
 				m_sstats_rownames);

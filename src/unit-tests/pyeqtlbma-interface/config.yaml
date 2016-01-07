@@ -2,6 +2,7 @@ geno: data/list_genotypes.txt
 scoord: data/snp_coords.bed.gz
 exp: data/list_phenotypes.txt
 gcoord: data/gene_coords.bed.gz
+sumstats: None
 anchor: TSS
 cis: 5
 lik: normal
