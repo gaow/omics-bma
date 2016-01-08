@@ -24,11 +24,17 @@ typedef std::map<std::string, double> dict_float;
 typedef std::map<std::string,
                  std::map<std::string,
                           std::vector<std::vector<double> > > >
-    dict_dict_matrixf;
+    dict_x2_matrixf;
 typedef std::map<std::string,
                  std::map<std::string,
                           std::vector<std::string > > >
-    dict_dict_vectors;
+    dict_x2_vectors;
+typedef std::map<std::string,
+                 std::map<std::string,
+                          std::map<std::string,
+                                   std::map<std::string,
+                                            double> > > >
+    dict_x4_float;
 
 /// exception handler. Exceptions will be passed to Python.
 class Exception
@@ -117,11 +123,11 @@ public:
 		const dict_int & param_i,
 		const dict_float & param_f,
 		const dict_vectors & param_vs,
-		const dict_dict_matrixf & sstats,
+		const dict_x4_float & sstats,
 		const dict_matrixf & priors);
 
-	dict_dict_matrixf GetSstats() { return m_sstats; };
-	dict_dict_vectors GetSstatsRownames() { return m_sstats_rownames; };
+	dict_x2_matrixf GetSstats() { return m_sstats; };
+	dict_x2_vectors GetSstatsRownames() { return m_sstats_rownames; };
 	dict_matrixf GetSepPermPvals() { return m_sep_perm_pvals; }
 	dict_vectors GetSepPermPvalsRownames() { return m_sep_perm_pvals_rownames; }
 	matrixf GetJoinPermPvals() { return m_join_perm_pvals; }
@@ -130,8 +136,8 @@ public:
 	dict_vectors GetAbfsNames() { return m_abfs_names; }
 
 private:
-	dict_dict_matrixf m_sstats;
-	dict_dict_vectors m_sstats_rownames;
+	dict_x2_matrixf m_sstats;
+	dict_x2_vectors m_sstats_rownames;
 	dict_matrixf m_sep_perm_pvals;
 	dict_vectors m_sep_perm_pvals_rownames;
 	matrixf m_join_perm_pvals;

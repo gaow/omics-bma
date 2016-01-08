@@ -2,17 +2,27 @@
 # utils_io.py
 # Gao Wang (c) 2015
 import numpy as np
+import deepdish as dd
 import pandas as pd
 import re
 
 def check_input_(params):
     def str2list(value):
         return [x.strip() for x in re.split(" |\+|,", value) if x.strip()]
+    #
     if "bfs" in params:
         params["bfs"] = str2list(params["bfs"])
     else:
         params["bfs"] = ["gen"]
+    #
     params["sbgrp"] = str2list(params["sbgrp"])
+    #
+    if params["sumstats"] is not None and params["sumstats"] != 'None':
+        params["sumstats"] = str2list(params["sumstats"])
+        if len(params["sumstats"]) != 2:
+            raise ValueError("Parameter 'sumstats' should have 2 elements: filename, data_path")
+        if not params["sumstats"][1].startswith("/"):
+            params["sumstats"][1] = "/" + params["sumstats"][1]
     return params
 
 def convert_data_(data, to_obj = None, rownames = None, colnames = None):
@@ -35,8 +45,12 @@ def is_empty_(v):
         else:
             return True
 
-def load_sumstats_(filename):
-    return  {'':{'':[[]]}}
+def load_sumstats_(filename, data_path):
+    res = dd.io.load(filename, data_path)
+    for k1, v1 in list(res.items()):
+        for k2, v2 in list(v1.items()):
+            res[k1][k2] = v2.transpose().to_dict()
+    return res
 
 class Map2DataFrame(object):
     '''
@@ -44,7 +58,7 @@ class Map2DataFrame(object):
     '''
     def __init__(self, data_type):
         if data_type == "ddm":
-            self.convert = self.get_dict_dict_obj
+            self.convert = self.get_dict_x2_obj
         elif data_type == "dm":
             self.convert = self.get_dict_obj
         elif data_type == "m":
@@ -52,7 +66,7 @@ class Map2DataFrame(object):
         else:
             raise ValueError("Unknown data type {}".format(data_type))
 
-    def get_dict_dict_obj(self, value, rownames, colnames):
+    def get_dict_x2_obj(self, value, rownames, colnames):
         if colnames is None and "colnames" in rownames:
             colnames = rownames["colnames"]
         res = {}
@@ -89,7 +103,10 @@ class Dict2Map(object):
         params["None"] = []
         for k, val in list(value.items()):
             if type(val) == str:
-                params["string"][k] = val
+                if val != "None":
+                    params["string"][k] = val
+                else:
+                    params["None"].append(k)
             elif type(val) == float:
                 params["float"][k] = val
             elif type(val) == int:

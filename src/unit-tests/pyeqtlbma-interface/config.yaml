@@ -2,18 +2,14 @@ geno: data/list_genotypes.txt
 scoord: data/snp_coords.bed.gz
 exp: data/list_phenotypes.txt
 gcoord: data/gene_coords.bed.gz
-sumstats: None
+covar: data/list_covariates.txt
+sumstats: sumstats.h5, SumStats
 anchor: TSS
 cis: 5
 lik: normal
 analys: join
 qnorm: 1
 maf: 0.01
-covar: data/list_covariates.txt
-gridL: data/grid_phi2_oma2_general.txt.gz
-gridS: data/grid_phi2_oma2_with-configs.txt.gz
-priorM: data/prior-matrix*.txt.gz
-gridM: data/matrix-scalars.txt.gz
 priors: data/priors.h5
 bfs: sin, customized
 error: hybrid

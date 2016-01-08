@@ -18,7 +18,7 @@ int eQtlBma::eqtlbma_bf(
                         const dict_int & param_i,
                         const dict_float & param_f,
                         const dict_vectors & param_vs,
-                        const dict_dict_matrixf & sstats,
+                        const dict_x4_float & sstats,
                         const dict_matrixf & priors
                         )
 {
@@ -47,10 +47,10 @@ int eQtlBma::eqtlbma_bf(
 			subgroups, samples, snp2object, mChr2VecPtSnps,
 			covariates, gene2object);
 	else
-		// loadSummaryStats(sstats, param_i.at("verbose"), subgroups, gene2object,
-		//  snp2object);
-		// FIXME: summary statistics have to be provided as map object not files
-		return 0;
+		formatSummaryStats(sstats, param_i.at(
+				"verbose"), gene2object,
+			snp2object);
+
 	if (gene2object.empty() || snp2object.empty())
 		return 0;
 
@@ -134,12 +134,11 @@ int eQtlBma::eqtlbma_bf(
 		if (param_s.at("analys") == "sep" && param_i.at("nperm") > 0 &&
 		    param_i.at("permsep") != 0) {
 			if (param_i.at("permsep") == 1)
-				extractResSepPermPvalSingleGroup(itG_begin, itG, (size_t)param_i.at(
-						"seed"), m_sep_perm_pvals);
+				extractResSepPermPvalSingleGroup(itG_begin, itG,
+					m_sep_perm_pvals);
 			else if (param_i.at("permsep") == 2)
 				extractResSepPermPvalMultiGroup(itG_begin, itG, subgroups,
-					(size_t)param_i.at(
-						"seed"), m_sep_perm_pvals, m_sep_perm_pvals_rownames);
+					m_sep_perm_pvals, m_sep_perm_pvals_rownames);
 		}
 
 
@@ -150,11 +149,8 @@ int eQtlBma::eqtlbma_bf(
 		}
 
 		if (param_s.at("analys") == "join" && param_i.at("nperm") > 0)
-			extractResJoinPermPval(itG_begin, itG, (size_t)param_i.at(
-					"seed"),
-				param_s.at("pbf"),
-				(bool)param_i.at(
-					"maxbf"), m_join_perm_pvals,
+			extractResJoinPermPval(itG_begin, itG, param_s.at("pbf"),
+				(bool)param_i.at("maxbf"), m_join_perm_pvals,
 				m_join_perm_pvals_rownames);
 
 		// progress tracker

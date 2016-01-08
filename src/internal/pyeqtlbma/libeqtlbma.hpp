@@ -144,7 +144,6 @@ void extractResSepPermPvalMultiGroup(
 	const std::map<std::string, quantgen::Gene>::iterator & itG_begin,
 	const std::map<std::string, quantgen::Gene>::iterator & itG_end,
 	const std::vector<std::string> & subgroups,
-	const size_t & seed,
 	std::map<std::string, std::vector<std::vector<double> > > & res_data,
 	std::map<std::string, std::vector<std::string> > & res_sbgrps
     );
@@ -152,7 +151,6 @@ void extractResSepPermPvalMultiGroup(
 void extractResSepPermPvalSingleGroup(
 	const std::map<std::string, quantgen::Gene>::iterator & itG_begin,
 	const std::map<std::string, quantgen::Gene>::iterator & itG_end,
-	const size_t & seed,
 	std::map<std::string, std::vector<std::vector<double> > > & res_data
     );
 
@@ -171,12 +169,20 @@ void extractResAbfs(
 void extractResJoinPermPval(
 	const std::map<std::string, quantgen::Gene>::iterator & itG_begin,
 	const std::map<std::string, quantgen::Gene>::iterator & itG_end,
-	const size_t & seed,
 	const std::string & permbf,
 	const bool & use_max_bf,
 	std::vector<std::vector<double> > & res_data,
 	std::vector<std::string> & res_names
     );
+
+void formatSummaryStats(const std::map<std::string,
+	                                   std::map<std::string,
+	                                            std::map<std::string,
+	                                                     std::map<std::string,
+	                                                              double> > > > & sstats,
+	const int & verbose,
+	std::map<std::string, quantgen::Gene> & gene2object,
+	std::map<std::string, quantgen::Snp> & snp2object);
 
 }
 

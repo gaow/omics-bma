@@ -309,7 +309,6 @@ void pyeqtlbma::extractResSepPermPvalMultiGroup(
                                                 const map<string,
                                                           Gene>::iterator & itG_end,
                                                 const vector<string> & subgroups,
-                                                const size_t & seed,
                                                 map<string,
                                                     vector<vector<double> > > & res_data,
                                                 map<string, vector<string> > & res_sbgrps
@@ -346,7 +345,6 @@ void pyeqtlbma::extractResSepPermPvalSingleGroup(
                                                            Gene>::iterator & itG_begin,
                                                  const map<string,
                                                            Gene>::iterator & itG_end,
-                                                 const size_t & seed,
                                                  map<string, vector<vector<double> > > & res_data
                                                  )
 {
@@ -533,7 +531,6 @@ void pyeqtlbma::extractResJoinPermPval(
                                                  Gene>::iterator & itG_begin,
                                        const map<string,
                                                  Gene>::iterator & itG_end,
-                                       const size_t & seed,
                                        const string & permbf,
                                        const bool & use_max_bf,
                                        vector<vector<double> > & res_data,
@@ -555,6 +552,56 @@ void pyeqtlbma::extractResJoinPermPval(
 			res_data.push_back(tmp_);
 		}
 	}
+}
+
+
+void pyeqtlbma::formatSummaryStats(const map<string,
+                                             map<string,
+                                                 map<string,
+                                                     map<string,
+                                                         double> > > > & sstats,
+                                   const int & verbose,
+                                   map<string, Gene> & gene2object,
+                                   map<string, Snp> & snp2object)
+{
+
+	Gene * pt_gene = NULL;
+	Snp * pt_snp = NULL;
+
+	vector<GeneSnpPair>::iterator it_gsp;
+	size_t idx_snp = string::npos;
+
+	// loop over genes
+	for (auto const & i : sstats) {
+		// create gene
+		if (gene2object.find(i.first) == gene2object.end())
+			gene2object.insert(make_pair(i.first, Gene(i.first)));
+		pt_gene = &(gene2object[i.first]);
+		// loop over subgroups
+		for (auto const & j  : i.second) {
+			// loop over SNPs
+			for (auto const & k : j.second) {
+				// create SNP if necessary
+				if (snp2object.find(k.first) == snp2object.end())
+					snp2object.insert(make_pair(k.first, Snp(k.first)));
+				pt_snp = &(snp2object[k.first]);
+
+				// get gene-snp pair (create it if necessary)
+				idx_snp = pt_gene->FindIdxSnp(pt_snp);
+				if (idx_snp == string::npos) {
+					pt_gene->AddCisSnp(pt_snp);
+					it_gsp = pt_gene->AddGeneSnpPair(pt_snp->GetName(), "uvlr");
+				} else
+					it_gsp = pt_gene->FindGeneSnpPair(idx_snp);
+
+				it_gsp->SetSstats(j.first,
+					(size_t)k.second.at("n"),
+					k.second.at("sigmahat"),
+					k.second.at("betahat.geno"),
+					k.second.at("sebetahat.geno"));
+			}   // end loop over SNPs
+		}       // end loop over subgroups
+	}           // end loop over genes
 }
 
 

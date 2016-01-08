@@ -79,11 +79,14 @@ namespace std
   %template(dict_vectori) map<string, vector<int> >;
   %template(dict_matrixi) map<string, vector<vector<int> > >;
   %template(dict_matrixf) map<string, vector<vector<double> > >;
-  %template(dict_dict_matrixf) map<string, map<string, vector<vector<double> > > >;
-  %template(dict_dict_vectors) map<string, map<string, vector<string> > >;
+  %template(dict_x2_matrixf) map<string, map<string, vector<vector<double> > > >;
+  %template(dict_x2_vectors) map<string, map<string, vector<string> > >;
   %template(dict_string) map<string, string>;
   %template(dict_int) map<string, int>;
   %template(dict_float) map<string, double>;
+  %template(dict_x2_float) map<string, map<string, double> >;
+  %template(dict_x3_float) map<string, map<string, map<string, double> > >;
+  %template(dict_x4_float) map<string, map<string, map<string, map<string, double> > > >;
 }
 
 %ignore pyeqtlbma::PyAction::PyAction(const PyAction & rhs);
