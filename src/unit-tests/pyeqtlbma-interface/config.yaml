@@ -14,7 +14,8 @@ gridL: data/grid_phi2_oma2_general.txt.gz
 gridS: data/grid_phi2_oma2_with-configs.txt.gz
 priorM: data/prior-matrix*.txt.gz
 gridM: data/matrix-scalars.txt.gz
-bfs: customized
+priors: data/priors.h5
+bfs: sin, customized
 error: hybrid
 fiterr: 0.5
 nperm: 100
@@ -26,6 +27,7 @@ pbf: all
 maxbf: 0
 thread: 4
 snp:
-sbgrp: [s1, s2, s3]
+sbgrp: s1, s2, s3
 wrtsize: 5
 verbose: 1
+output: test.h5

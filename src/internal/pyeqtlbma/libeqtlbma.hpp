@@ -54,7 +54,7 @@ void testForAssociations(
 	const quantgen::Grid & iGridL,
 	const quantgen::Grid & iGridS,
 	const quantgen::PriorMatrices & iPriorM,
-	const std::string & bfs,
+	const std::vector<std::string> & bfs,
 	const std::string & error_model,
 	const float & prop_cov_errors,
 	const int & verbose,
@@ -163,7 +163,7 @@ void extractResAbfs(
 	const quantgen::Grid & iGridL,
 	const quantgen::Grid & iGridS,
 	const quantgen::PriorMatrices & iPriorM,
-	const std::string & bfs,
+	const std::vector<std::string> & bfs,
 	std::map<std::string, std::vector<std::vector<double> > > & res_data,
 	std::map<std::string, std::vector<std::string> > & res_names
     );

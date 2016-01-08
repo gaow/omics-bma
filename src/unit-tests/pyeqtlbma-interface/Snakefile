@@ -1,9 +1,9 @@
-from OmicsBMA.core import run_eqtlbma_bf
+from OmicsBMA.core import test_association
 
 configfile: "config.yaml"
 
-rule pairwise_bf:
+rule test_association:
   threads:
     config['thread']
   run:
-    run_eqtlbma_bf(config, "test.h5")
+    test_association(config)

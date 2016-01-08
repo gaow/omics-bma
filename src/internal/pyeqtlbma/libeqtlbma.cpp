@@ -6,6 +6,12 @@ using namespace std;
 using namespace utils;
 using namespace quantgen;
 
+inline bool has_value(const vector<string> & sarray, const string & item)
+{
+	return find(sarray.begin(), sarray.end(), item) != sarray.end();
+}
+
+
 vector<Snp *> pyeqtlbma::getSnpsForChr(
                                        const map<string,
                                                  vector<Snp *> > & mChr2VecPtSnps,
@@ -35,7 +41,7 @@ void pyeqtlbma::testForAssociations(
                                     const Grid & iGridL,
                                     const Grid & iGridS,
                                     const PriorMatrices & iPriorM,
-                                    const string & bfs,
+                                    const vector<string> & bfs,
                                     const string & error_model,
                                     const float & prop_cov_errors,
                                     const int & verbose,
@@ -368,7 +374,7 @@ void pyeqtlbma::extractResAbfs(
                                const Grid & iGridL,
                                const Grid & iGridS,
                                const PriorMatrices & iPriorM,
-                               const string & bfs,
+                               const vector<string> & bfs,
                                map<string, vector<vector<double> > > & res_data,
                                map<string, vector<string> > & res_names
                                )
@@ -432,32 +438,30 @@ void pyeqtlbma::extractResAbfs(
 				res_names["colnames"].push_back("gen.avg");
 				res_names["colnames"].push_back("gen-fix.avg");
 				res_names["colnames"].push_back("gen-maxh.avg");
-				if (bfs == "sin" || bfs == "all" ||
-				    bfs == "customized") res_names["colnames"].push_back(
-						"gen-sin.avg");
+				if (has_value(bfs, "sin") || has_value(bfs, "all"))
+					res_names["colnames"].push_back("gen-sin.avg");
 
-				if (bfs == "all") res_names["colnames"].push_back("all.avg");
-				if (bfs == "customized") res_names["colnames"].push_back(
-						"customized.avg");
+				if (has_value(bfs, "all"))
+					res_names["colnames"].push_back("all.avg");
+				if (has_value(bfs, "customized"))
+					res_names["colnames"].push_back("customized.avg");
 
 			}
 			tmp_.push_back(it_pair->GetWeightedAbf("gen"));
 			tmp_.push_back(it_pair->GetWeightedAbf("gen-fix"));
 			tmp_.push_back(it_pair->GetWeightedAbf("gen-maxh"));
-			if (bfs == "sin" || bfs == "all" ||
-			    bfs ==
-			    "customized") tmp_.push_back(it_pair->GetWeightedAbf("gen-sin"));
+			if (has_value(bfs, "sin") || has_value(bfs, "all"))
+				tmp_.push_back(it_pair->GetWeightedAbf("gen-sin"));
 
 
-
-			if (bfs == "all") tmp_.push_back(it_pair->GetWeightedAbf("all"));
-			if (bfs ==
-			    "customized") tmp_.push_back(it_pair->GetWeightedAbf(
-						"customized"));
+			if (has_value(bfs,
+					"all")) tmp_.push_back(it_pair->GetWeightedAbf("all"));
+			if (has_value(bfs, "customized"))
+				tmp_.push_back(it_pair->GetWeightedAbf("customized"));
 
 
 			// write the BFs for each config (small grid)
-			if (bfs != "gen") {
+			if (has_value(bfs, "sin") || has_value(bfs, "all")) {
 				for (size_t k = 1; k <= nb_subgroups; ++k) {
 					comb = gsl_combination_calloc(nb_subgroups, k);
 					if (comb == NULL) {
@@ -493,12 +497,12 @@ void pyeqtlbma::extractResAbfs(
 							break;
 					}
 					gsl_combination_free(comb);
-					if (bfs == "sin" || bfs == "customized")
+					if (!has_value(bfs, "all"))
 						break;
 				}
 			}
 			// write the BFs for each customized prior (with customized grid)
-			if (bfs == "customized") {
+			if (has_value(bfs, "customized")) {
 				for (size_t m = 0; m < iPriorM.Wg_names.size(); ++m) {
 					// write indiviual BFs
 					for (size_t j = 0; j < iPriorM.Wg_scalars.size(); ++j) {
@@ -548,7 +552,9 @@ void pyeqtlbma::extractResJoinPermPval(
 				                    GetNbPermutationsJoin(),
 				                    it_gene->second.GetTrueL10Abf(use_max_bf),
 				                    it_gene->second.GetMedianPermL10Abf() };
-      res_data.push_back(tmp_);
+			res_data.push_back(tmp_);
 		}
 	}
 }
+
+

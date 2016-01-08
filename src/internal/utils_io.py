@@ -3,6 +3,17 @@
 # Gao Wang (c) 2015
 import numpy as np
 import pandas as pd
+import re
+
+def check_input_(params):
+    def str2list(value):
+        return [x.strip() for x in re.split(" |\+|,", value) if x.strip()]
+    if "bfs" in params:
+        params["bfs"] = str2list(params["bfs"])
+    else:
+        params["bfs"] = ["gen"]
+    params["sbgrp"] = str2list(params["sbgrp"])
+    return params
 
 def convert_data_(data, to_obj = None, rownames = None, colnames = None):
     '''

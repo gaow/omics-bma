@@ -117,7 +117,8 @@ public:
 		const dict_int & param_i,
 		const dict_float & param_f,
 		const dict_vectors & param_vs,
-		const dict_dict_matrixf & sstats);
+		const dict_dict_matrixf & sstats,
+		const dict_matrixf & priors);
 
 	dict_dict_matrixf GetSstats() { return m_sstats; };
 	dict_dict_vectors GetSstatsRownames() { return m_sstats_rownames; };

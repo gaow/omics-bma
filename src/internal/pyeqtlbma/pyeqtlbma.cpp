@@ -18,7 +18,8 @@ int eQtlBma::eqtlbma_bf(
                         const dict_int & param_i,
                         const dict_float & param_f,
                         const dict_vectors & param_vs,
-                        const dict_dict_matrixf & sstats
+                        const dict_dict_matrixf & sstats,
+                        const dict_matrixf & priors
                         )
 {
 	set<string> sSnpsToKeep;
@@ -54,12 +55,11 @@ int eQtlBma::eqtlbma_bf(
 		return 0;
 
 	// load grid / customized priors
-	Grid iGridL(param_s.at("gridL"), true, param_i.at("verbose"));
-	Grid iGridS(param_s.at("gridS"), false, param_i.at("verbose"));
-	PriorMatrices iPriorM(param_s.at("priorM"), param_s.at("gridM"),
-	                      subgroups.size(),
+	Grid iGridL(priors, "gridL", true, param_i.at("verbose"));
+	Grid iGridS(priors, "gridS", false, param_i.at("verbose"));
+	PriorMatrices iPriorM(priors, "gridM", { "gridL", "gridS" },
 	                      param_i.at("verbose"));
-  //
+	//
 	size_t countGenes = 0;
 	size_t totalGenes = gene2object.size();
 	bool is_perm = param_i.at("nperm") > 0 &&
@@ -107,7 +107,7 @@ int eQtlBma::eqtlbma_bf(
 			subgroups, samples, param_s.at("lik"), param_s.at("analys"),
 			(bool)param_i.at(
 				"qnorm"), covariates, iGridL, iGridS, iPriorM,
-			param_s.at("bfs"),
+			param_vs.at("bfs"),
 			param_s.at("error"), param_f.at("fiterr"), param_i.at("verbose"),
 			itG_begin, itG, nbAnalyzedGenes, nbAnalyzedPairs);
 		if (is_perm) {
@@ -145,7 +145,7 @@ int eQtlBma::eqtlbma_bf(
 
 		if (param_s.at("analys") == "join") {
 			extractResAbfs(itG_begin, itG, subgroups.size(),
-				iGridL, iGridS, iPriorM, param_s.at("bfs"), m_abfs,
+				iGridL, iGridS, iPriorM, param_vs.at("bfs"), m_abfs,
 				m_abfs_names);
 		}
 
