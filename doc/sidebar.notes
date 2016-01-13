@@ -6,6 +6,7 @@
 #}
 #{list
 # ""[Installation|@installation@]""
+## [MOSEK optimizer|@installation-mosek@]
 #}
 #{list
 # ""[Concepts|@concepts@]""

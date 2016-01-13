@@ -51,7 +51,7 @@ rule src_internal_pyeqtlbma:
   shell:
     '''
     {config[md]} {input} -o {output[0]};
-    {config[wk]} {input} -o {output[1]} --compact_toc
+    {config[wk]} {input} -o {output[1]} --compact_toc --stamps time git-version
     '''
 
 rule src_external:
@@ -78,6 +78,26 @@ rule src_internal:
     {config[wk]} {input} -o {output[1]} --compact_toc
     '''
 
+rule cop_implementation:
+  input:
+    "cop-implementation.notes"
+  output:
+    "wiki/development/scopt-implementation.txt"
+  shell:
+    '''
+    {config[wk]} {input} -o {output} --compact_toc --stamps time git-version
+    '''
+
+rule mosek_installation:
+  input:
+    "mosek.notes"
+  output:
+    "wiki/installation-mosek.txt"
+  shell:
+    '''
+    {config[wk]} {input} -o {output} --compact_toc
+    '''
+
 rule bar1:
   input: "sidebar.notes"
   output: "wiki/sidebar.txt"
@@ -88,5 +108,6 @@ rule all:
     rules.home.output, rules.src_internal_pyeqtlbma.output,
     rules.src_external.output, rules.src_internal.output,
     rules.doc.output, rules.src.output, rules.todo.output,
-    rules.bar1.output
+    rules.bar1.output, rules.cop_implementation.output,
+    rules.mosek_installation.output
   shell: "rsync -av --include='*/' --include='*.txt' --exclude='*' --prune-empty-dirs --delete --delete-excluded --chmod=g+w wiki/ {config[user]}@{config[path]}"

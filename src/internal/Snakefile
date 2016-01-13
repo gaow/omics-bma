@@ -18,11 +18,12 @@ rule swig:
     i = "pyeqtlbma/pyeqtlbma.i",
   output:
     cxx = "pyeqtlbma/pyeqtlbma_wrap.cxx",
-    py = "pyeqtlbma/pyeqtlbma.py"
+    py = "pyeqtlbma/__init__.py"
   params:
-    swig_opts = "-c++ -python -O -shadow -keyword -w-511 -w-509"
+    swig_opts = "-c++ -python -O -shadow -keyword -w-511 -w-509",
+    swig_interface = "pyeqtlbma/pyeqtlbma.py"
   shell:
-    "swig {params.swig_opts} -o {output.cxx} {input.i}"
+    "swig {params.swig_opts} -o {output.cxx} {input.i}; mv {params.swig_interface} {output.py}"
 
 rule deepdish:
   input: "../external/deepdish/setup.py"

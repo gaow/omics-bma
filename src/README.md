@@ -17,5 +17,6 @@ Quality control for coding is implemented as [unit-tests](unit-tests).
 *  Fix Issues 3 and 4 the exception handling.
 *  Fix compression type and level for pandas interface via deepdish. Currently these options are ignored.
 *  Allow append mode in deepdish.io.save().
-*  Implement input parameter check!
+*  Implement input parameter check with respect to the old omic-bma branch interface: when sumstats is used, error=ulvr, analys=sep and no permutation
 *  Add column names to all BF() results
+*  Implement customized priors for UVLR

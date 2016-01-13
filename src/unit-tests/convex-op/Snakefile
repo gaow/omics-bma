@@ -4,7 +4,10 @@ rule get_test_data:
 
 rule compare_mix_fit:
      output: "EM.res", "COP.res"
-     shell: "Rscript GetTestData.R"
+     shell: "Rscript CompareMixFit.R"
 
 rule all:
      input: rules.get_test_data.output, rules.compare_mix_fit.output
+
+rule clean:
+     shell: "rm -f *.res"

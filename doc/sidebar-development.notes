@@ -7,6 +7,7 @@
 #{list
 # **[OmicBMA library|@development/internal@]**
 ## [eqtlbma Python interface|@development/internal/pyeqtlbma@]
+## [Mixture model optimization|@development/scopt-implementation@]
 #}
 #{list
 # **[TODO|@development/todo@]**
