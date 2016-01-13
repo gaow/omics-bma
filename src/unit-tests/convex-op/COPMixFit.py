@@ -2,7 +2,8 @@
 # Gao Wang (c) 2015
 import numpy as np
 import mosek as mk
-from scipy.sparse import coo_matrix as make_aij_sparse
+from mosek import iparam, dparam, sparam
+from scipy.sparse import csc_matrix as make_sparse
 import warnings
 warnings.simplefilter(action = "ignore", category = FutureWarning)
 
@@ -19,7 +20,6 @@ def mixIP(f_data, f_prior):
     # Optimize
     res = kw_dual(matrix_lik, np.ones(k), normalize(w))
 
-
 def load_data(lik, prior):
     return np.loadtxt(lik), np.loadtxt(prior)
 
@@ -30,7 +30,7 @@ def streamprinter(text):
     sys.stdout.write(text)
     sys.stdout.flush()
 
-def kw_dual(A, d, w, rtol = 1E-6, verb = 0, **kwargs):
+def kw_dual(A, d, w, rtol = 1E-6, control = {}):
     '''
     Dual Kiefer-Wolfowitz MLE for Mixture Problems
 
@@ -45,24 +45,26 @@ def kw_dual(A, d, w, rtol = 1E-6, verb = 0, **kwargs):
 
     Parameters
     ----------
-    A : matrix
+    A : double[][]
       Linear constraint matrix
-    d : vector
+    d : double[]
       constraint vector
-    w : vector
+    w : double[]
       weights for `x`, should sum to one
-    rtol :
+    rtol : double
       the relative tolerance for dual gap convergence criterion
-    verb : Integer from 0 to 5
-      to control verbosity desired from mosek
-    control : dictionary
-      various mosek control parameters, see mosek Python API documentation for details
+    control  : dictionary
+      various mosek control parameters, e.g. control = {'iparam.log' : 10, 'iparam.num_threads' : 8}
+      see mosek Python API documentation for details:
       http://docs.mosek.com/7.1/pythonapi/Parameters.html
       http://docs.mosek.com/7.1/pythonapi/Conventions_employed_in_the_API.html
 
     Returns
     -------
-    data : anything
+    c : double[]
+      solution for the constraints
+    converged : bool
+      whether or not the optimizer converged
     '''
     # Since the value of infinity is ignored, we define it solely
     # for symbolic purposes
@@ -70,7 +72,11 @@ def kw_dual(A, d, w, rtol = 1E-6, verb = 0, **kwargs):
     # number of variables and number of constraints
     numvar, numcon = A.shape
     # Make sparse matrix to satisfy Mosek requirement
-    A_sparse = make_aij_sparse(A)
+    ## aptrb = AT_sparse.indptr[:-1]
+    ## aptre = AT_sparse.indptr[1:]
+    ## asub = AT_sparse.indices
+    ## aval = AT_sparse.data
+    AT_sparse = make_sparse(A.T)
     # Bound key for constraints, <= d
     bkc = [ mk.boundkey.up ] * numcon
     # Lower / upper bounds for constraints
@@ -88,14 +94,22 @@ def kw_dual(A, d, w, rtol = 1E-6, verb = 0, **kwargs):
     oprho = np.zeros(numvar)
     #
     res = [ 0.0 ] * numcon
-    # set mosek params
-    # FIXME: all kwargs should be set here
-    mk.dparam.intpnt_nl_tol_rel_gap = rtol
 
     with mk.Env() as mk_env:
         mk_env.set_Stream (mk.streamtype.log, streamprinter)
         with mk_env.Task(0,0) as task:
             task.set_Stream (mk.streamtype.log, streamprinter)
+            # set mosek params
+            task.putdouparam(dparam.intpnt_nl_tol_rel_gap, rtol)
+            for (param, value) in control.items():
+                if param[:6] == "iparam":
+                    task.putintparam(eval(param), val)
+                elif param[:6] == "dparam":
+                    task.putdouparam(eval(param), val)
+                elif str(param)[:6] == "sparam":
+                    task.putstrparam(eval(param), val)
+                else:
+                    raise ValueError("invalid MOSEK parameter: {}".format(param))
             task.appendvars(numvar)
             task.appendcons(numcon)
             # logic follows from REBayes::KWDual hereafter
@@ -103,7 +117,9 @@ def kw_dual(A, d, w, rtol = 1E-6, verb = 0, **kwargs):
             ## objective coefficients
             task.putclist(np.arange(numvar), np.zeros(numvar))
             ## constraint matrix coefficients
-            task.putaijlist(A_sparse.col, A_sparse.row, A_sparse.data)
+            task.putacolslice(0, numvar,
+                              AT_sparse.indptr[:-1], AT_sparse.indptr[1:],
+                              AT_sparse.indices, AT_sparse.data)
             ## bounds
             task.putconboundslice(0, numcon, bkc, blc, buc)
             task.putvarboundslice(0, numvar, bkx, blx, bux)
@@ -115,8 +131,8 @@ def kw_dual(A, d, w, rtol = 1E-6, verb = 0, **kwargs):
             ## get results
             task.getsolutionslice(mk.soltype.itr, mk.solitem.xc, 0, numcon, res)
             converged = task.getsolsta(mk.soltype.itr) in [mk.solsta.optimal, mk.solsta.near_optimal]
-    print(oprfo[0:10], normalize(res), converged)
-    return normalize(res)
+    print(normalize(res), converged)
+    return normalize(res), converged
 
 if __name__ == '__main__':
     mixIP("data.txt", "prior.txt")

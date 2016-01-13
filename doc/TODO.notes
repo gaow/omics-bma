@@ -9,5 +9,4 @@
 # Implement input parameter check with respect to the old omic-bma branch interface: when sumstats is used, error=ulvr, analys=sep and no permutation
 # Add column names to all BF() results
 # Implement customized priors for UVLR
-# Implement control args for SCOPT
 #}
