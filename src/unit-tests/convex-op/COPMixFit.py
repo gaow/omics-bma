@@ -129,7 +129,7 @@ def kw_dual(A, d, w, rtol = 1E-6, control = {}):
             ## run
             task.optimize()
             ## get results
-            task.getsolutionslice(mk.soltype.itr, mk.solitem.xc, 0, numcon, res)
+            task.getsolutionslice(mk.soltype.itr, mk.solitem.suc, 0, numcon, res)
             converged = task.getsolsta(mk.soltype.itr) in [mk.solsta.optimal, mk.solsta.near_optimal]
     print(normalize(res), converged)
     return normalize(res), converged
