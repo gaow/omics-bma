@@ -1,9 +1,10 @@
+# Association testing
 geno: data/list_genotypes.txt
 scoord: data/snp_coords.bed.gz
 exp: data/list_phenotypes.txt
 gcoord: data/gene_coords.bed.gz
 covar: data/list_covariates.txt
-sumstats: sumstats.h5, SumStats
+sumstats:
 anchor: TSS
 cis: 5
 lik: normal
@@ -21,9 +22,9 @@ tricut: 10
 permsep: 0
 pbf: all
 maxbf: 0
-thread: 4
+thread: 8
 snp:
 sbgrp: s1, s2, s3
-wrtsize: 5
 verbose: 1
-output: test.h5
+output: stamp(output/test_association.h5)
+# Mixture model fitting

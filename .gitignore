@@ -1,8 +1,10 @@
+data
+output
 .snakemake
 *.tmp
 *.orig
 doc/wiki
-doc/run.sh
+**/run.sh
 src/external/*
 !src/external/Snakefile
 !src/external/README.md

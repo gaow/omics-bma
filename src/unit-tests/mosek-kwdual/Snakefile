@@ -26,9 +26,10 @@ rule fit_mix_py:
   shell: "python FitMix.py > COP.res"
 
 rule compare_methods:
-  output: touch("done.txt")
+  threads: 8
   params:
     niter = 5, level = 6
+  output: touch("done.txt")
   run:
     for i in range(params.niter):
       # run simulation & computation

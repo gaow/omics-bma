@@ -1,0 +1,9 @@
+configfile: "config.yaml"
+
+rule upload_assets:
+  shell:
+    "rsync -auvP --prune-empty-dirs --chmod=g+w {config[assets_dir]}/* {config[user]}@{config[path]}"
+
+rule download_assets:
+  shell:
+    "rsync -auvP --prune-empty-dirs {config[user]}@{config[path]}/* {config[assets_dir]}"

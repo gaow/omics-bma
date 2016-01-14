@@ -27,7 +27,7 @@ def streamprinter(text):
     sys.stdout.write(text)
     sys.stdout.flush()
 
-def kw_dual(A, d, w, rtol = 1E-6, control = {}):
+def kw_dual(A, d, w, rtol = None, control = {}):
     '''
     Dual Kiefer-Wolfowitz MLE for Mixture Problems
 
@@ -50,6 +50,7 @@ def kw_dual(A, d, w, rtol = 1E-6, control = {}):
       weights for `x`, should sum to one
     rtol : double
       the relative tolerance for dual gap convergence criterion
+      default to min(1E-7, 0.1 / numvars)
     control  : dictionary
       various mosek control parameters, e.g. control = {'iparam.log' : 10, 'iparam.num_threads' : 8}
       see mosek Python API documentation for details:
@@ -90,6 +91,8 @@ def kw_dual(A, d, w, rtol = 1E-6, control = {}):
     oprgo = np.ones(numvar)
     oprho = np.zeros(numvar)
     #
+    if rtol is None:
+        rtol = min(1E-7, 0.1 / float(numvar))
     res = [ 0.0 ] * numcon
 
     with mk.Env() as mk_env:

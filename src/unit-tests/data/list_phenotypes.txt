@@ -1,3 +1,0 @@
-s1 data/phenotypes_s1.txt.gz
-s2 data/phenotypes_s2.txt.gz
-s3 data/phenotypes_s3.txt.gz

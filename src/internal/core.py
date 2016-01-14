@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 # core.py
 # Gao Wang (c) 2015
-from OmicsBMA.utils_io import *
-from OmicsBMA.pyeqtlbma import *
+from .utils_io import *
+from .pyeqtlbma import *
 
 def test_association(params):
     params = check_input_(params)

@@ -5,6 +5,7 @@ import numpy as np
 import deepdish as dd
 import pandas as pd
 import re
+from .utils import *
 
 def check_input_(params):
     def str2list(value):
@@ -20,9 +21,16 @@ def check_input_(params):
     if params["sumstats"] is not None and params["sumstats"] != 'None':
         params["sumstats"] = str2list(params["sumstats"])
         if len(params["sumstats"]) != 2:
-            raise ValueError("Parameter 'sumstats' should have 2 elements: filename, data_path")
+            env.error("Parameter 'sumstats' should have 2 elements: filename, data_path", exit = True)
         if not params["sumstats"][1].startswith("/"):
             params["sumstats"][1] = "/" + params["sumstats"][1]
+    #
+    if "wrtsize" not in params:
+        params["wrtsize"] = 10
+    try:
+        params["output"] = rename_stamp(re.match(r'stamp\((.*)\)', params["output"]).group(1))
+    except AttributeError:
+        pass
     return params
 
 def convert_data_(data, to_obj = None, rownames = None, colnames = None):
@@ -64,7 +72,7 @@ class Map2DataFrame(object):
         elif data_type == "m":
             self.convert = self.get_matrix_obj
         else:
-            raise ValueError("Unknown data type {}".format(data_type))
+            env.error("Unknown data type {}".format(data_type), exit = True)
 
     def get_dict_x2_obj(self, value, rownames, colnames):
         if colnames is None and "colnames" in rownames:
