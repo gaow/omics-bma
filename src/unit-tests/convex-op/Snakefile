@@ -1,13 +1,60 @@
-rule get_test_data:
-     output: "prior.txt", "init.txt", "data.txt"
-     shell: "Rscript GetTestData.R"
+import numpy as np
 
-rule compare_mix_fit:
-     output: "EM.res", "COP.res"
-     shell: "Rscript CompareMixFit.R"
+def test_equal(em, cop, level = 6, level_cutoff = 3):
+  try:
+      np.testing.assert_almost_equal(em, cop, level)
+  except AssertionError:
+      if level <= level_cutoff:
+          raise
+      else:
+          level = level - 1
+          test_equal(em, cop, level)
+  return level
+
+rule get_test_data:
+  output: "prior.txt", "init.txt", "data.txt"
+  shell: "Rscript GetTestData.R"
+
+rule fit_mix_R:
+  input: rules.get_test_data.output
+  output: "EM.res"
+  shell: "Rscript FitMix.R &> /dev/null"
+
+rule fit_mix_py:
+  input: rules.get_test_data.output
+  output: "SCOPT.res"
+  shell: "python FitMix.py > COP.res"
+
+rule compare_methods:
+  output: touch("done.txt")
+  params:
+    niter = 5, level = 6
+  run:
+    for i in range(params.niter):
+      # run simulation & computation
+      shell('''snakemake clean -q; snakemake get_test_data -q;
+            snakemake fit_mix_R -q; snakemake fit_mix_py -q''')
+      # Load results
+      with open("EM.res") as f:
+          txt = f.readlines()
+          em = np.array([float(x) for x in txt[0].strip().split()])
+          em_status = txt[-1].strip().upper()
+      with open("COP.res") as f:
+          txt = f.readlines()
+          cop = np.array([float(x) for x in txt[0].strip().split()])
+          cop_status = txt[-1].strip().upper()
+      if em_status != "TRUE":
+          print("EM did not converge")
+          continue
+      if cop_status != "TRUE":
+          print("IP-COP did not converge")
+          continue
+      level = test_equal(em, cop, params.level)
+      print("Test %s passed at level %s!" % (i + 1, level))
 
 rule all:
-     input: rules.get_test_data.output, rules.compare_mix_fit.output
+  input:
+    "done.txt"
 
 rule clean:
-     shell: "rm -f *.res"
+     shell: "rm -f *.res *.txt"

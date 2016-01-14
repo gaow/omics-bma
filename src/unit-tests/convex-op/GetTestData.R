@@ -1,4 +1,4 @@
-set.seed(100)
+# set.seed(100)
 options(digits = 13)
 sampsize = 10000
 sd = c(1, 1.1, 1.2)

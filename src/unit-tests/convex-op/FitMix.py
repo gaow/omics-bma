@@ -19,6 +19,7 @@ def mixIP(f_data, f_prior):
     w = w[w != 0]
     # Optimize
     res = kw_dual(matrix_lik, np.ones(k), normalize(w))
+    return res
 
 def load_data(lik, prior):
     return np.loadtxt(lik), np.loadtxt(prior)
@@ -131,8 +132,9 @@ def kw_dual(A, d, w, rtol = 1E-6, control = {}):
             ## get results
             task.getsolutionslice(mk.soltype.itr, mk.solitem.suc, 0, numcon, res)
             converged = task.getsolsta(mk.soltype.itr) in [mk.solsta.optimal, mk.solsta.near_optimal]
-    print(normalize(res), converged)
     return normalize(res), converged
 
 if __name__ == '__main__':
-    mixIP("data.txt", "prior.txt")
+    res = mixIP("data.txt", "prior.txt")
+    print('\t'.join(list(map(str, res[0]))))
+    print(res[1])
