@@ -5,5 +5,14 @@ configfile: "config.yaml"
 rule test_association:
   threads:
     config['thread']
+  output:
+    touch("test_association.done")
   run:
     test_association(config)
+
+rule all:
+  input:
+    "test_association.done"
+
+rule clean:
+  shell: "rm -f *.done"
