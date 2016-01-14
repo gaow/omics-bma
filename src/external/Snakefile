@@ -1,8 +1,9 @@
 GSL_VERSION = "1.16"
 SM_VERSION = "3.5.4"
+MOSEK_VERSION = "7.1.0.44"
 
 rule all:
-  input: "eqtlbma", "gsl", "snakemake", "deepdish"
+  input: "eqtlbma", "gsl", "snakemake", "deepdish", "mosek"
 
 rule eqtlbma:
   params: url = "https://github.com/gaow/eqtlbma.git"
@@ -29,6 +30,16 @@ rule snakemake:
     wget {params.url}
     tar zxvf snakemake-{SM_VERSION}.tar.gz
     mv snakemake-{SM_VERSION} {output}
+    '''
+
+rule mosek:
+  params: url = "http://download.mosek.com/stable/{}/mosektoolslinux64x86.tar.bz2".format(MOSEK_VERSION)
+  output: "mosek"
+  shell:
+    '''
+    rm -f mosektoolslinux64x86.tar.bz2
+    wget {params.url}
+    tar jxvf mosektoolslinux64x86.tar.bz2
     '''
 
 rule deepdish:
