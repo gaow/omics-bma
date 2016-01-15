@@ -1,11 +1,12 @@
 #! /usr/bin/env python3
 # utils.py
 # Gao Wang (c) 2015
-import sys, os, subprocess, shutil, glob, shlex, re, hashlib, tempfile, datetime
+import sys, os, subprocess, shutil, glob, shlex, re, hashlib, tempfile, datetime, gzip
 from io import StringIO
 from contextlib import contextmanager
 import itertools
 from collections import OrderedDict, defaultdict, Counter
+import pandas as pd
 
 class Environment:
     def __init__(self):
@@ -330,7 +331,7 @@ def rename_stamp(filename):
         branch = runCommand('git rev-parse --abbrev-ref HEAD')[0].strip()
     except:
         branch = None
-    stamp = '-{}{}.'.format(date, '-{}'.format(branch) if branch is not None else '')
+    stamp = '_{}{}.'.format(date, '_{}'.format(branch) if branch is not None else '')
     return stamp.join(filename.rsplit('.', 1))
 
 def physicalMemory():
@@ -346,6 +347,18 @@ def physicalMemory():
         except Exception as e:
             return None
 
+def get_value_type(x):
+    if x.lower() in ['na','nan','null','none']:
+        x = 'nan'
+    try:
+        int(x)
+        return 'int'
+    except:
+        try:
+            float(x)
+            return 'float'
+        except:
+            return 'string'
 
 class StdoutCapturer(list):
     def __enter__(self):
@@ -461,3 +474,16 @@ def copyFiles(pattern, dist, ignore_hidden = True):
     for fl in glob.glob(pattern):
         if os.path.isfile(fl):
             shutil.copy(fl, dist)
+
+def is_empty(v):
+    if type(v) == pd.DataFrame:
+        return v.empty
+    else:
+        if v:
+            return False
+        else:
+            return True
+
+def replace_non_alnum(x):
+    trans = ''.join(chr(c) if chr(c).isalnum() else '_' for c in range(256))
+    x.translate(trans)

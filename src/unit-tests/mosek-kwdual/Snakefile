@@ -1,15 +1,5 @@
 import numpy as np
-
-def test_equal(em, cop, level = 6, level_cutoff = 3):
-  try:
-      np.testing.assert_almost_equal(em, cop, level)
-  except AssertionError:
-      if level <= level_cutoff:
-          raise
-      else:
-          level = level - 1
-          test_equal(em, cop, level)
-  return level
+from OmicsBMA.utils_math import test_almost_equal_recursive
 
 rule get_test_data:
   output: "prior.txt", "init.txt", "data.txt"
@@ -50,7 +40,7 @@ rule compare_methods:
       if cop_status != "TRUE":
           print("IP-COP did not converge")
           continue
-      level = test_equal(em, cop, params.level)
+      level = test_almost_equal_recursive(em, cop, params.level)
       print("Test %s passed at level %s!" % (i + 1, level))
 
 rule all:

@@ -373,6 +373,7 @@ void pyeqtlbma::extractResAbfs(
                                const Grid & iGridS,
                                const PriorMatrices & iPriorM,
                                const vector<string> & bfs,
+                               const bool & outw,
                                map<string, vector<vector<double> > > & res_data,
                                map<string, vector<string> > & res_names
                                )
@@ -432,31 +433,32 @@ void pyeqtlbma::extractResAbfs(
 				tmp_.push_back(*it);
 
 			// write averaged gen, gen-fix, gen-maxh BFs
-			if (!colnames_saved) {
-				res_names["colnames"].push_back("gen.avg");
-				res_names["colnames"].push_back("gen-fix.avg");
-				res_names["colnames"].push_back("gen-maxh.avg");
+			if (outw) {
+				if (!colnames_saved) {
+					res_names["colnames"].push_back("gen.avg");
+					res_names["colnames"].push_back("gen-fix.avg");
+					res_names["colnames"].push_back("gen-maxh.avg");
+					if (has_value(bfs, "sin") || has_value(bfs, "all"))
+						res_names["colnames"].push_back("gen-sin.avg");
+
+					if (has_value(bfs, "all"))
+						res_names["colnames"].push_back("all.avg");
+					if (has_value(bfs, "customized"))
+						res_names["colnames"].push_back("customized.avg");
+
+				}
+				tmp_.push_back(it_pair->GetWeightedAbf("gen"));
+				tmp_.push_back(it_pair->GetWeightedAbf("gen-fix"));
+				tmp_.push_back(it_pair->GetWeightedAbf("gen-maxh"));
 				if (has_value(bfs, "sin") || has_value(bfs, "all"))
-					res_names["colnames"].push_back("gen-sin.avg");
+					tmp_.push_back(it_pair->GetWeightedAbf("gen-sin"));
 
-				if (has_value(bfs, "all"))
-					res_names["colnames"].push_back("all.avg");
+
+				if (has_value(bfs,
+						"all")) tmp_.push_back(it_pair->GetWeightedAbf("all"));
 				if (has_value(bfs, "customized"))
-					res_names["colnames"].push_back("customized.avg");
-
+					tmp_.push_back(it_pair->GetWeightedAbf("customized"));
 			}
-			tmp_.push_back(it_pair->GetWeightedAbf("gen"));
-			tmp_.push_back(it_pair->GetWeightedAbf("gen-fix"));
-			tmp_.push_back(it_pair->GetWeightedAbf("gen-maxh"));
-			if (has_value(bfs, "sin") || has_value(bfs, "all"))
-				tmp_.push_back(it_pair->GetWeightedAbf("gen-sin"));
-
-
-			if (has_value(bfs,
-					"all")) tmp_.push_back(it_pair->GetWeightedAbf("all"));
-			if (has_value(bfs, "customized"))
-				tmp_.push_back(it_pair->GetWeightedAbf("customized"));
-
 
 			// write the BFs for each config (small grid)
 			if (has_value(bfs, "sin") || has_value(bfs, "all")) {
@@ -488,9 +490,12 @@ void pyeqtlbma::extractResAbfs(
 												 ssConfig.str()) + j));
 						}
 						// write avg BFs
-						if (!colnames_saved) res_names["colnames"].push_back(
-								"cfg." + ssConfig.str() + ".avg");
-						tmp_.push_back(it_pair->GetWeightedAbf(ssConfig.str()));
+						if (outw) {
+							if (!colnames_saved) res_names["colnames"].push_back(
+									"cfg." + ssConfig.str() + ".avg");
+							tmp_.push_back(it_pair->GetWeightedAbf(
+									ssConfig.str()));
+						}
 						if (gsl_combination_next(comb) != GSL_SUCCESS)
 							break;
 					}

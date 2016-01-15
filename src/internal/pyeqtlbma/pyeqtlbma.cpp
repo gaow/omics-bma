@@ -144,7 +144,8 @@ int eQtlBma::eqtlbma_bf(
 
 		if (param_s.at("analys") == "join") {
 			extractResAbfs(itG_begin, itG, subgroups.size(),
-				iGridL, iGridS, iPriorM, param_vs.at("bfs"), m_abfs,
+				iGridL, iGridS, iPriorM, param_vs.at("bfs"),
+				(bool)param_i.at("out_avg"), m_abfs,
 				m_abfs_names);
 		}
 

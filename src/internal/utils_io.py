@@ -7,7 +7,7 @@ import pandas as pd
 import re
 from .utils import *
 
-def check_input_(params):
+def check_input(params):
     def str2list(value):
         return [x.strip() for x in re.split(" |\+|,", value) if x.strip()]
     #
@@ -33,7 +33,7 @@ def check_input_(params):
         pass
     return params
 
-def convert_data_(data, to_obj = None, rownames = None, colnames = None):
+def convert_data(data, to_obj = None, rownames = None, colnames = None):
     '''
     An interface of functions below
     '''
@@ -44,16 +44,7 @@ def convert_data_(data, to_obj = None, rownames = None, colnames = None):
     else:
         return data
 
-def is_empty_(v):
-    if type(v) == pd.DataFrame:
-        return v.empty
-    else:
-        if v:
-            return False
-        else:
-            return True
-
-def load_sumstats_(filename, data_path):
+def load_sumstats(filename, data_path):
     res = dd.io.load(filename, data_path)
     for k1, v1 in list(res.items()):
         for k2, v2 in list(v1.items()):

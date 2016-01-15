@@ -1,11 +1,10 @@
-# Association testing
 geno: data/list_genotypes.txt
 scoord: data/snp_coords.bed.gz
 exp: data/list_phenotypes.txt
 gcoord: data/gene_coords.bed.gz
 covar: data/list_covariates.txt
-out_avg: 1
 sumstats:
+out_avg: 0
 anchor: TSS
 cis: 5
 lik: normal
@@ -13,8 +12,10 @@ analys: join
 qnorm: 1
 maf: 0.01
 priors: data/priors.h5
-bfs: sin, customized
-error: hybrid
+gridL: data/grid_phi2_oma2_general.txt.gz
+gridS: data/grid_phi2_oma2_with-configs.txt.gz
+bfs: sin
+error: mvlr
 fiterr: 0.5
 nperm: 100
 seed: 10086
@@ -25,7 +26,6 @@ pbf: all
 maxbf: 0
 thread: 8
 snp:
-sbgrp: s1, s2, s3
+sbgrp: s1+s2+s3
 verbose: 1
 output: stamp(output/test_association.h5)
-# Mixture model fitting

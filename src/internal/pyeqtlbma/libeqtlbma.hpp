@@ -162,6 +162,7 @@ void extractResAbfs(
 	const quantgen::Grid & iGridS,
 	const quantgen::PriorMatrices & iPriorM,
 	const std::vector<std::string> & bfs,
+  const bool & outw,
 	std::map<std::string, std::vector<std::vector<double> > > & res_data,
 	std::map<std::string, std::vector<std::string> > & res_names
     );

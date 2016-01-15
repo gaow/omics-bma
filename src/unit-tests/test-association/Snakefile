@@ -1,0 +1,59 @@
+from OmicsBMA.core import test_association
+from OmicsBMA.utils import rename_stamp
+from test_utils import *
+import numpy as np
+
+configfile: "config.yaml"
+
+rule test_association:
+  threads:
+    config['thread']
+  output:
+    touch("test_association.done")
+  run:
+    test_association(config)
+
+rule eqtlbma_bf:
+  threads:
+    config['thread']
+  output:
+    touch("eqtlbma_bf.done")
+  shell:
+    '''
+    eqtlbma_bf --geno {config[geno]} --scoord {config[scoord]} --exp {config[exp]} \
+    --gcoord {config[gcoord]} --covar {config[covar]} --anchor {config[anchor]} \
+    --cis {config[cis]} --lik {config[lik]} --analys {config[analys]} --qnorm {config[qnorm]} \
+    --maf {config[maf]} --gridL {config[gridL]} --gridS {config[gridS]} --bfs sin --error {config[error]} \
+    --fiterr {config[fiterr]} --nperm {config[nperm]} --seed {config[seed]} --trick {config[trick]} \
+    --tricut {config[tricut]} --permsep {config[permsep]} --pbf gen-sin --maxbf {config[maxbf]} \
+    --thread {config[thread]} --sbgrp s1+s2+s3 --out output/test_association
+    '''
+
+rule compare_output:
+  input:
+    "test_association.done", "eqtlbma_bf.done"
+  threads:
+    config['thread']
+  output:
+    touch("comparison.done")
+  run:
+    data1 = load_omicsbma_bf(rename_stamp('output/test_association.h5'))
+    data2 = load_eqtlbma_bf('output/test_association_l10abfs_raw.txt.gz')
+    genes = list(data2.keys())
+    for g in genes:
+        snps = list(data2[g].index)
+        cols = list(data2[g])
+        for s in snps:
+            for x, y, z in zip(data1[g].loc[s, cols], data2[g].loc[s, cols], cols):
+                try:
+                    np.testing.assert_almost_equal(x, y, 5)
+                except:
+                    print(g, s, z)
+                    raise
+
+rule all:
+  input:
+    "comparison.done"
+
+rule clean:
+  shell: "rm -f *.done"
