@@ -1,0 +1,55 @@
+from OmicsBMA.core import test_association
+from OmicsBMA.utils import rename_stamp, Timer, env
+from OmicsBMA.mix_opt import mixIP
+import deepdish as dd
+from test_utils import *
+import tables as tb
+import warnings
+warnings.simplefilter(action = "ignore", category = tb.NaturalNameWarning)
+import pandas as pd
+import time
+
+configfile: "config.yaml"
+
+rule generate_toy_data:
+  input:
+    "data/head.txt.gz"
+  output:
+    "data/head.h5"
+  run:
+    data = load_eqtlbma_bf(input[0])
+    dd.io.save("data/head.h5", data, compression = ("zlib", 9))
+
+rule generate_data:
+  input:
+    "data/test_association_l10abfs.gz"
+  output:
+    "data/test_association_l10abfs.h5"
+  run:
+    data = load_eqtlbma_bf(input[0])
+    dd.io.save("data/test_association_l10abfs.h5", data, compression = ("zlib", 9))
+
+rule execute_benchmark:
+  threads:
+    config["thread"]
+  input:
+    "data/head.txt.gz",
+    rules.generate_toy_data.output
+  output:
+    touch("benchmark.done")
+  run:
+    with Timer() as t:
+        data = load_omicsbma_bf(input[1])
+        # res = mixIP(pd.concat(data), control = {'iparam.num_threads': config["thread"]})
+        res = mixIP(pd.concat(data).ix[:,:54], control = {'iparam.num_threads': config["thread"]})
+    env.log("Convex optimization took %.03f sec." % t.secs)
+    with Timer() as t:
+        shell("eqtlbma_hm --data {input[0]} --nsubgrp 44 --dim 44 --ngrid 10 --out test.gz --thresh 0.01 --model configs --thread {config[thread]} -v 0")
+    env.log("EM algorithm took %.03f sec." % t.secs)
+
+rule all:
+  input:
+    "benchmark.done"
+
+rule clean:
+  shell: "rm -f *.done"

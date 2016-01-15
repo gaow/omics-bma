@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # utils.py
 # Gao Wang (c) 2015
-import sys, os, subprocess, shutil, glob, shlex, re, hashlib, tempfile, datetime, gzip
+import sys, os, subprocess, shutil, glob, shlex, re, hashlib, tempfile, datetime, gzip, time
 from io import StringIO
 from contextlib import contextmanager
 import itertools
@@ -13,6 +13,8 @@ class Environment:
         self.term_width = None
         self.__width_cache = 1
         self.path = {'PATH':"{}:{}".format(os.getcwd(), os.environ["PATH"])}
+        self.debug = False
+        self.quiet = False
 
     def error(self, msg = None, show_help = False, exit = False):
         if msg is None:
@@ -487,3 +489,19 @@ def is_empty(v):
 def replace_non_alnum(x):
     trans = ''.join(chr(c) if chr(c).isalnum() else '_' for c in range(256))
     x.translate(trans)
+
+
+class Timer(object):
+    def __init__(self, verbose=False):
+        self.verbose = verbose
+
+    def __enter__(self):
+        self.start = time.time()
+        return self
+
+    def __exit__(self, *args):
+        self.end = time.time()
+        self.secs = self.end - self.start
+        self.msecs = self.secs * 1000  # millisecs
+        if self.verbose:
+            print('elapsed time: %.03f ms' % self.msecs)

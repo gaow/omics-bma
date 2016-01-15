@@ -8,16 +8,18 @@ from scipy.sparse import csc_matrix as make_sparse
 import warnings
 warnings.simplefilter(action = "ignore", category = FutureWarning)
 
-def mixIP(matrix_lik, prior):
+def mixIP(matrix_lik, prior = None, control = {}):
     n, k = matrix_lik.shape
-    # Add in observations corresponding to prior
-    matrix_lik = np.vstack((np.diag(np.ones(len(prior))), matrix_lik))
-    w = np.concatenate((prior - 1, np.ones(n)))
-    # Remove zero weight entries
-    matrix_lik = matrix_lik[w != 0,:]
-    w = w[w != 0]
+    w = np.ones(n)
+    if prior is not None:
+        # Add in observations corresponding to prior
+        matrix_lik = np.vstack((np.diag(np.ones(len(prior))), matrix_lik))
+        w = np.concatenate((prior - 1, w))
+        # Remove zero weight entries
+        matrix_lik = matrix_lik[w != 0,:]
+        w = w[w != 0]
     # Optimize
-    res = kw_dual(matrix_lik, np.ones(k), normalize(w))
+    res = kw_dual(matrix_lik, np.ones(k), normalize(w), control = control)
     return res
 
 def normalize(v):
@@ -103,11 +105,11 @@ def kw_dual(A, d, w, rtol = None, control = {}):
             task.putdouparam(dparam.intpnt_nl_tol_rel_gap, rtol)
             for (param, value) in control.items():
                 if param[:6] == "iparam":
-                    task.putintparam(eval(param), val)
+                    task.putintparam(eval(param), value)
                 elif param[:6] == "dparam":
-                    task.putdouparam(eval(param), val)
+                    task.putdouparam(eval(param), value)
                 elif str(param)[:6] == "sparam":
-                    task.putstrparam(eval(param), val)
+                    task.putstrparam(eval(param), value)
                 else:
                     raise ValueError("invalid MOSEK parameter: {}".format(param))
             task.appendvars(numvar)
