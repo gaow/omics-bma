@@ -112,40 +112,48 @@ rule unit_test_mk:
   input:
     "unit-tests-mk.notes"
   output:
-    "../src/unit-tests/mosek-kwdual/README.md"
+    "../src/unit-tests/mosek-kwdual/README.md",
+    "wiki/development/unittest-mosek.txt"
   shell:
     '''
     {config[md]} {input} -o {output[0]};
+    {config[wk]} {input} -o {output[1]} --compact_toc
     '''
 
 rule unit_test_interface:
   input:
     "unit-tests-interface.notes"
   output:
-    "../src/unit-tests/pyeqtlbma-interface/README.md"
+    "../src/unit-tests/pyeqtlbma-interface/README.md",
+    "wiki/development/unittest-interface.txt"
   shell:
     '''
     {config[md]} {input} -o {output[0]};
+    {config[wk]} {input} -o {output[1]} --compact_toc
     '''
 
 rule unit_test_bf:
   input:
     "unit-tests-bf.notes"
   output:
-    "../src/unit-tests/test-association/README.md"
+    "../src/unit-tests/test-association/README.md",
+    "wiki/development/unittest-association.txt"
   shell:
     '''
     {config[md]} {input} -o {output[0]};
+    {config[wk]} {input} -o {output[1]} --compact_toc
     '''
 
 rule unit_test_mix_model_benchmark:
   input:
     "unit-tests-mm-benchmark.notes"
   output:
-    "../src/unit-tests/mix-model-benchmark/README.md"
+    "../src/unit-tests/mix-model-benchmark/README.md",
+    "wiki/development/benchmark-mixopt.txt"
   shell:
     '''
     {config[md]} {input} -o {output[0]};
+    {config[wk]} {input} -o {output[1]} --compact_toc
     '''
 
 rule bar1:

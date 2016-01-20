@@ -6,8 +6,15 @@
 #}
 #{list
 # **[OmicBMA library|@development/internal@]**
-## [eqtlbma Python interface|@development/internal/pyeqtlbma@]
+## [Python/C++ interface|@development/internal/pyeqtlbma@]
 ## [Mixture model optimization|@development/scopt-implementation@]
+#}
+#{list
+# **[Unit testing|@development/start@]**
+## [Library interface|@development/unittest-interface@]
+## [Association testing|@development/unittest-association@]
+## [Convex optimization|@development/unittest-mosek@]
+## [Mixture model benchmark|@development/benchmark-mixopt@]
 #}
 #{list
 # **[TODO|@development/todo@]**
