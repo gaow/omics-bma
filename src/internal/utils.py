@@ -332,7 +332,7 @@ def rename_stamp(filename):
     time = datetime.datetime.now()
     date = time.strftime("%Y") + time.strftime("%m") + time.strftime("%d")
     try:
-        branch = runCommand('git rev-parse --abbrev-ref HEAD')[0].strip()
+        branch = runCommand('git rev-parse --abbrev-ref HEAD')[0]
     except:
         branch = None
     stamp = '_{}{}.'.format(date, '_{}'.format(branch) if branch is not None else '')
@@ -447,7 +447,7 @@ def runCommand(cmd, instream = None, msg = '', upon_succ = None, show_stderr = F
     if upon_succ:
         # call the function (upon_succ) using others as parameters.
         upon_succ[0](*(upon_succ[1:]))
-    return out, error
+    return out.strip(), error.strip()
 
 def zipdir(path, zipfile, arcroot = '/'):
     path = os.path.normpath(path)
