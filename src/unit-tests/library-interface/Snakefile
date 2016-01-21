@@ -1,4 +1,4 @@
-from OmicsBMA.core import test_association
+from OmicsBMA.core import test_association, fit_hm
 
 configfile: "config.yaml"
 
@@ -10,9 +10,17 @@ rule test_association:
   run:
     test_association(config)
 
+rule fit_hm:
+  threads:
+    config['thread']
+  output:
+    touch("fit_hm.done")
+  run:
+    fit_hm(config)
+
 rule all:
   input:
-    "test_association.done"
+    "test_association.done", "fit_hm.done"
 
 rule clean:
   shell: "rm -f *.done"

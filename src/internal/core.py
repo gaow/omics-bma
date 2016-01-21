@@ -1,19 +1,25 @@
 #! /usr/bin/env python3
 # core.py
 # Gao Wang (c) 2015
+import os
+import numpy as np
 import pandas as pd
 import deepdish as dd
 from .utils_io import InputChecker, map2pandas, load_ddm
-from .utils import is_empty
+from .utils import is_empty, env
 from .pyeqtlbma import BFCalculator
 from .mix_opt import mixIP
 from .utils_math import PosteriorCalculator
 
 def test_association(params):
     params = InputChecker('test_association').apply(params)
-    sumstats = {'':{'':{'':{'':0}}}}
-    if "sumstats" not in params["None"]:
-        sumstats = load_ddm(params["vectors"]["sumstats"][0], params["vectors"]["sumstats"][1])
+    try:
+        fn = params["vectors"]["sumstats"]
+        sumstats = load_ddm(fn[0], fn[1])
+        env.log("Use existing summary statistics data from [{}]".\
+                format(os.path.join(os.path.splitext(fn[0])[0], fn[1])))
+    except:
+        sumstats = {'':{'':{'':{'':0}}}}
     exe = BFCalculator(params["string"], params["int"], params["float"], params["vectors"])
     exe.apply(sumstats, dd.io.load(params["string"]["priors"]))
     res = {"SumStats":
@@ -37,7 +43,12 @@ def test_association(params):
 
 def fit_hm(params):
     params = InputChecker('fit_hm').apply(params)
-    data = dd.io.load(params["output"], params["table_abf"])
+    data = dd.io.load(params["output"], '/' + params["table_abf"])
+    res, converged = mixIP(pd.concat(data), control = params["optimizer_control"])
+    if not converged:
+        env.error("Convex optimization for hierarchical Model did not converge!")
+    # FIXME: eventually all output should be in the same file after I update deepdish with append mode
+    dd.io.save(params["output_2"], {params["table_pi"]: np.array(res)}, compression=("zlib", 9))
 
 def posterior_inference(param):
     pass

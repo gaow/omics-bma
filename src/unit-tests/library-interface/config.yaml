@@ -29,3 +29,6 @@ sbgrp: s1, s2, s3
 verbose: 1
 output: stamp(output/test_association.h5)
 # Mixture model fitting
+table_abf: Abfs
+output_2: weights.h5
+table_pi: pi

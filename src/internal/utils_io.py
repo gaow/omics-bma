@@ -46,6 +46,14 @@ class InputChecker:
         return dict2map(params)
 
     def check_fit_hm_input(self, params):
+        try:
+            params["output"] = rename_stamp(re.match(r'stamp\((.*)\)', params["output"]).group(1))
+        except AttributeError:
+            pass
+        if not 'optimizer_control' in params:
+            params['optimizer_control'] = {}
+        if "thread" in params:
+            params['optimizer_control']['iparam.num_threads'] = params['thread']
         return params
 
     def check_posterior_inference_input(self, params):

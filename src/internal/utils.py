@@ -29,7 +29,11 @@ class Environment:
         start = '\n' if msg.startswith('\n') else ''
         end = '\n' if msg.endswith('\n') else ''
         msg = msg.strip()
-        sys.stderr.write(start + "\033[1;40;33mERROR: {}\033[0m\n".format(msg) + end)
+        if exit:
+            tag = 'ERROR'
+        else:
+            tag = 'WARNING'
+        sys.stderr.write(start + "\033[1;40;33m{}: {}\033[0m\n".format(tag, msg) + end)
         if show_help:
             self.log("Type '{} -h' for help message".format(env.prog))
             sys.exit()
