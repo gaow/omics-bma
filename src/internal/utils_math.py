@@ -3,6 +3,10 @@
 # Gao Wang (c) 2015
 import numpy as np
 
+class PosteriorCalculator(object):
+    def __init__(self):
+        pass
+
 def test_almost_equal_recursive(x, y, level = 6, level_cutoff = 3):
   try:
       np.testing.assert_almost_equal(x, y, level)

@@ -112,18 +112,26 @@ public:
 // initialize C++ module, currently does nothing
 void initialize();
 
-class eQtlBma
+class BFCalculator
 {
 public:
-	eQtlBma () {};
-	~eQtlBma() {};
+	BFCalculator (
+	              const dict_string & param_s,
+	              const dict_int & param_i,
+	              const dict_float & param_f,
+	              const dict_vectors & param_vs
+	              )
+	{
+		m_s = param_s;
+		m_i = param_i;
+		m_f = param_f;
+		m_vs = param_vs;
+	}
 
-	int eqtlbma_bf(
-		const dict_string & param_s,
-		const dict_int & param_i,
-		const dict_float & param_f,
-		const dict_vectors & param_vs,
-		const dict_x4_float & sstats,
+
+	~BFCalculator() {};
+
+	int apply(const dict_x4_float & sstats,
 		const dict_matrixf & priors);
 
 	dict_x2_matrixf GetSstats() { return m_sstats; };
@@ -136,6 +144,10 @@ public:
 	dict_vectors GetAbfsNames() { return m_abfs_names; }
 
 private:
+	dict_string m_s;
+	dict_int m_i;
+	dict_float m_f;
+	dict_vectors m_vs;
 	dict_x2_matrixf m_sstats;
 	dict_x2_vectors m_sstats_rownames;
 	dict_matrixf m_sep_perm_pvals;

@@ -1,33 +1,43 @@
 #! /usr/bin/env python3
 # core.py
 # Gao Wang (c) 2015
-from .utils_io import *
+import pandas as pd
+import deepdish as dd
+from .utils_io import InputChecker, map2pandas, load_ddm
 from .utils import is_empty
-from .pyeqtlbma import *
+from .pyeqtlbma import BFCalculator
+from .mix_opt import mixIP
+from .utils_math import PosteriorCalculator
 
 def test_association(params):
-    params = check_input(params)
-    params = convert_data(params)
-    exe = eQtlBma()
-    exe.eqtlbma_bf(params["string"], params["int"], params["float"], params["vectors"],
-                   {'':{'':{'':{'':0}}}} if "sumstats" in params["None"]
-                   else load_sumstats(params["vectors"]["sumstats"][0], params["vectors"]["sumstats"][1]),
-                   dd.io.load(params["string"]["priors"]))
+    params = InputChecker('test_association').apply(params)
+    sumstats = {'':{'':{'':{'':0}}}}
+    if "sumstats" not in params["None"]:
+        sumstats = load_ddm(params["vectors"]["sumstats"][0], params["vectors"]["sumstats"][1])
+    exe = BFCalculator(params["string"], params["int"], params["float"], params["vectors"])
+    exe.apply(sumstats, dd.io.load(params["string"]["priors"]))
     res = {"SumStats":
-           convert_data(exe.GetSstats(), "ddm",
-                         rownames = exe.GetSstatsRownames(),
-                         colnames = ("maf", "n", "pve", "sigmahat", "betahat.geno",
-                                     "sebetahat.geno", "betapval.geno")),
+           map2pandas(exe.GetSstats(), "ddm",
+                      rownames = exe.GetSstatsRownames(),
+                      colnames = ("maf", "n", "pve", "sigmahat", "betahat.geno",
+                                  "sebetahat.geno", "betapval.geno")),
            "Abfs":
-           convert_data(exe.GetAbfs(), "dm",
-                         rownames = exe.GetAbfsNames()),
+           map2pandas(exe.GetAbfs(), "dm",
+                      rownames = exe.GetAbfsNames()),
            "SepPermPvals":
-           convert_data(exe.GetSepPermPvals(), "dm",
-                         rownames = exe.GetSepPermPvalsRownames()),
+           map2pandas(exe.GetSepPermPvals(), "dm",
+                      rownames = exe.GetSepPermPvalsRownames()),
            "JoinPermPvals":
-           convert_data(exe.GetJoinPermPvals(), "m",
-                         rownames = exe.GetJoinPermPvalsRownames())
+           map2pandas(exe.GetJoinPermPvals(), "m",
+                      rownames = exe.GetJoinPermPvalsRownames())
            }
     dd.io.save(params["string"]["output"],
                dict((k, v) for k, v in res.items() if not is_empty(v)),
                compression=("zlib", 9))
+
+def fit_hm(params):
+    params = InputChecker('fit_hm').apply(params)
+    data = dd.io.load(params["output"], params["table_abf"])
+
+def posterior_inference(param):
+    pass

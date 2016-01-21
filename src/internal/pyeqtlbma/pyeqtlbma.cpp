@@ -13,18 +13,12 @@ void initialize()
 
 
 // implementation follows from the logic in eqtlbma_bf.cpp
-int eQtlBma::eqtlbma_bf(
-                        const dict_string & param_s,
-                        const dict_int & param_i,
-                        const dict_float & param_f,
-                        const dict_vectors & param_vs,
-                        const dict_x4_float & sstats,
-                        const dict_matrixf & priors
-                        )
+int BFCalculator::apply(const dict_x4_float & sstats,
+                        const dict_matrixf & priors)
 {
 	set<string> sSnpsToKeep;
-	if (param_s.find("snp") != param_s.end()) {
-		loadSnpsToKeep(param_s.at("snp"), param_i.at("verbose"), sSnpsToKeep);
+	if (m_s.find("snp") != m_s.end()) {
+		loadSnpsToKeep(m_s.at("snp"), m_i.at("verbose"), sSnpsToKeep);
 		if (sSnpsToKeep.empty())
 			return 0;
 	}
@@ -37,17 +31,17 @@ int eQtlBma::eqtlbma_bf(
 	map<string, Gene> gene2object;
 
 	if (sstats.begin()->first.empty())
-		loadRawInputData(param_s.at("geno"), param_s.at("scoord"),
-			param_s.at("exp"),
-			param_s.at("gcoord"), param_s.at("anchor"), (size_t)param_i.at(
+		loadRawInputData(m_s.at("geno"), m_s.at("scoord"),
+			m_s.at("exp"),
+			m_s.at("gcoord"), m_s.at("anchor"), (size_t)m_i.at(
 				"cis"),
-			param_f.at("maf"), param_s.at("covar"),
-			param_s.at("error"), param_vs.at("sbgrp"), sSnpsToKeep,
-			param_i.at("verbose"),
+			m_f.at("maf"), m_s.at("covar"),
+			m_s.at("error"), m_vs.at("sbgrp"), sSnpsToKeep,
+			m_i.at("verbose"),
 			subgroups, samples, snp2object, mChr2VecPtSnps,
 			covariates, gene2object);
 	else
-		formatSummaryStats(sstats, param_i.at(
+		formatSummaryStats(sstats, m_i.at(
 				"verbose"), gene2object,
 			snp2object);
 
@@ -55,114 +49,114 @@ int eQtlBma::eqtlbma_bf(
 		return 0;
 
 	// load grid / customized priors
-	Grid iGridL(priors, "gridL", true, param_i.at("verbose"));
-	Grid iGridS(priors, "gridS", false, param_i.at("verbose"));
+	Grid iGridL(priors, "gridL", true, m_i.at("verbose"));
+	Grid iGridS(priors, "gridS", false, m_i.at("verbose"));
 	PriorMatrices iPriorM(priors, "gridM", { "gridL", "gridS" },
-	                      param_i.at("verbose"));
+	                      m_i.at("verbose"));
 	//
 	size_t countGenes = 0;
 	size_t totalGenes = gene2object.size();
-	bool is_perm = param_i.at("nperm") > 0 &&
-	               (param_i.at("permsep") != 0 || param_s.at("pbf") != "none");
-	if (param_i.at("verbose") > 0) {
+	bool is_perm = m_i.at("nperm") > 0 &&
+	               (m_i.at("permsep") != 0 || m_s.at("pbf") != "none");
+	if (m_i.at("verbose") > 0) {
 		cout	<< "test for association between each pair gene-SNP ..." << endl
-		        << "analysis=" << param_s.at("analys")
-		        << " likelihood=" << param_s.at("lik")
-		        << " error_model=" << param_s.at("error");
-		if (param_s.at("error") != "uvlr") // i.e. if 'mvlr' or 'hybrid'
-			cout << " prop_cov_errors=" << param_f.at("fiterr");
+		        << "analysis=" << m_s.at("analys")
+		        << " likelihood=" << m_s.at("lik")
+		        << " error_model=" << m_s.at("error");
+		if (m_s.at("error") != "uvlr") // i.e. if 'mvlr' or 'hybrid'
+			cout << " prop_cov_errors=" << m_f.at("fiterr");
 		if (sstats.begin()->first.empty())
-			cout << " anchor=" << param_s.at("anchor") << " radius=" <<
-			    param_i.at("cis");
+			cout << " anchor=" << m_s.at("anchor") << " radius=" <<
+			    m_i.at("cis");
 		if (is_perm) {
 			cout	<< endl << "permutation" <<
-			(param_i.at("nperm") > 1 ? "s=" : "=")
-			        << param_i.at("nperm") << " seed=" << param_i.at("seed");
-			if (param_i.at("trick") != 0) {
-				cout	<< " trick=" << param_i.at("trick")
-				        << " trick_cutoff=" << param_i.at("tricut");
+			(m_i.at("nperm") > 1 ? "s=" : "=")
+			        << m_i.at("nperm") << " seed=" << m_i.at("seed");
+			if (m_i.at("trick") != 0) {
+				cout	<< " trick=" << m_i.at("trick")
+				        << " trick_cutoff=" << m_i.at("tricut");
 			}
-			if (param_s.at("analys") == "sep")
-				cout << " perm_sep=" << param_i.at("permsep");
-			else if (param_s.at("analys") == "join")
-				cout << " perm_bf=" << param_s.at("pbf");
-			cout << " threads=" << param_i.at("thread");
+			if (m_s.at("analys") == "sep")
+				cout << " perm_sep=" << m_i.at("permsep");
+			else if (m_s.at("analys") == "join")
+				cout << " perm_bf=" << m_s.at("pbf");
+			cout << " threads=" << m_i.at("thread");
 		}
 		cout << endl << flush;
 	}
 	clock_t startTime = clock();
 	size_t nbAnalyzedGenes = 0, nbAnalyzedPairs = 0;
-	if (param_i.at("verbose") == 1)
+	if (m_i.at("verbose") == 1)
 		progressBar("", 0, totalGenes);
 	for (map<string, Gene>::iterator itG = gene2object.begin();
 	     itG != gene2object.end(); ) {
 		map<string, Gene>::iterator itG_begin = itG;
 		size_t step_size = min((int)distance(itG, gene2object.end()),
-			param_i.at("wrtsize"));
+			m_i.at("wrtsize"));
 		advance(itG, step_size);
 		testForAssociations(
-			sstats.begin()->first.empty(), mChr2VecPtSnps, param_s.at(
+			sstats.begin()->first.empty(), mChr2VecPtSnps, m_s.at(
 				"anchor"),
-			(size_t)param_i.at("cis"),
-			subgroups, samples, param_s.at("lik"), param_s.at("analys"),
-			(bool)param_i.at(
+			(size_t)m_i.at("cis"),
+			subgroups, samples, m_s.at("lik"), m_s.at("analys"),
+			(bool)m_i.at(
 				"qnorm"), covariates, iGridL, iGridS, iPriorM,
-			param_vs.at("bfs"),
-			param_s.at("error"), param_f.at("fiterr"), param_i.at("verbose"),
+			m_vs.at("bfs"),
+			m_s.at("error"), m_f.at("fiterr"), m_i.at("verbose"),
 			itG_begin, itG, nbAnalyzedGenes, nbAnalyzedPairs);
 		if (is_perm) {
-			omp_set_num_threads(param_i.at("thread"));
-			makePermutations(subgroups, samples, param_s.at("lik"),
-				param_s.at("analys"),
-				(bool)param_i.at(
+			omp_set_num_threads(m_i.at("thread"));
+			makePermutations(subgroups, samples, m_s.at("lik"),
+				m_s.at("analys"),
+				(bool)m_i.at(
 					"qnorm"), covariates, iGridL, iGridS, iPriorM,
-				param_s.at("error"), param_f.at("fiterr"),
-				(size_t)param_i.at("nperm"), (size_t)param_i.at("seed"),
-				param_i.at("trick"), (size_t)param_i.at("tricut"),
-				param_i.at("permsep"), param_s.at("pbf"), (bool)param_i.at(
+				m_s.at("error"), m_f.at("fiterr"),
+				(size_t)m_i.at("nperm"), (size_t)m_i.at("seed"),
+				m_i.at("trick"), (size_t)m_i.at("tricut"),
+				m_i.at("permsep"), m_s.at("pbf"), (bool)m_i.at(
 					"maxbf"), itG_begin,
 				itG);
 		}
 
 		// write results
-		if (param_s.at("analys") == "sep" ||
-		    (param_s.at("analys") == "join" && sstats.begin()->first.empty() &&
-		     param_s.at("error") != "mvlr"))
+		if (m_s.at("analys") == "sep" ||
+		    (m_s.at("analys") == "join" && sstats.begin()->first.empty() &&
+		     m_s.at("error") != "mvlr"))
 			extractResSstats(subgroups, itG_begin, itG, snp2object, m_sstats,
 				m_sstats_rownames);
 
-		if (param_s.at("analys") == "sep" && param_i.at("nperm") > 0 &&
-		    param_i.at("permsep") != 0) {
-			if (param_i.at("permsep") == 1)
+		if (m_s.at("analys") == "sep" && m_i.at("nperm") > 0 &&
+		    m_i.at("permsep") != 0) {
+			if (m_i.at("permsep") == 1)
 				extractResSepPermPvalSingleGroup(itG_begin, itG,
 					m_sep_perm_pvals);
-			else if (param_i.at("permsep") == 2)
+			else if (m_i.at("permsep") == 2)
 				extractResSepPermPvalMultiGroup(itG_begin, itG, subgroups,
 					m_sep_perm_pvals, m_sep_perm_pvals_rownames);
 		}
 
 
-		if (param_s.at("analys") == "join") {
+		if (m_s.at("analys") == "join") {
 			extractResAbfs(itG_begin, itG, subgroups.size(),
-				iGridL, iGridS, iPriorM, param_vs.at("bfs"),
-				(bool)param_i.at("out_avg"), m_abfs,
+				iGridL, iGridS, iPriorM, m_vs.at("bfs"),
+				(bool)m_i.at("out_avg"), m_abfs,
 				m_abfs_names);
 		}
 
-		if (param_s.at("analys") == "join" && param_i.at("nperm") > 0)
-			extractResJoinPermPval(itG_begin, itG, param_s.at("pbf"),
-				(bool)param_i.at("maxbf"), m_join_perm_pvals,
+		if (m_s.at("analys") == "join" && m_i.at("nperm") > 0)
+			extractResJoinPermPval(itG_begin, itG, m_s.at("pbf"),
+				(bool)m_i.at("maxbf"), m_join_perm_pvals,
 				m_join_perm_pvals_rownames);
 
 		// progress tracker
 		countGenes += step_size;
-		if (param_i.at("verbose") == 1)
+		if (m_i.at("verbose") == 1)
 			progressBar("", countGenes, totalGenes);
 		// delete processed object to release RAM
 		gene2object.erase(itG_begin, itG);
 	}
-	if (param_i.at("verbose") > 0) {
-		if (param_i.at("verbose") == 1)
+	if (m_i.at("verbose") > 0) {
+		if (m_i.at("verbose") == 1)
 			cout	<< " (" << fixed << setprecision(2) << getElapsedTime(
 				startTime)
 			        << " sec)" << endl << flush;
