@@ -517,10 +517,13 @@ void pyeqtlbma::extractResAbfs(
 											 Wg_names[m]) + j));
 					}
 					// write average BFs
-					if (!colnames_saved) res_names["colnames"].push_back(
-							iPriorM.Wg_names[
-							    m] + ".avg");
-					tmp_.push_back(it_pair->GetWeightedAbf(iPriorM.Wg_names[m]));
+					if (outw) {
+						if (!colnames_saved) res_names["colnames"].push_back(
+								iPriorM.Wg_names[
+								    m] + ".avg");
+						tmp_.push_back(it_pair->GetWeightedAbf(iPriorM.Wg_names[
+								    m]));
+					}
 				}
 			}
 			// collect results data

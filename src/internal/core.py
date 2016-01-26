@@ -43,12 +43,16 @@ def test_association(params):
 
 def fit_hm(params):
     params = InputChecker('fit_hm').apply(params)
-    data = dd.io.load(params["output"], '/' + params["table_abf"])
-    res, converged = mixIP(pd.concat(data), control = params["optimizer_control"])
+    data = pd.concat(dd.io.load(params["output"], '/' + params["table_abf"])).\
+      rename(columns = {'nb_groups' : 'null'})
+    # FIXME: need to implement penalized null
+    data['null'] = 1
+    res, converged = mixIP(data, control = params["optimizer_control"])
     if not converged:
         env.error("Convex optimization for hierarchical Model did not converge!")
     # FIXME: eventually all output should be in the same file after I update deepdish with append mode
-    dd.io.save(params["output_2"], {params["table_pi"]: np.array(res)}, compression=("zlib", 9))
+    dd.io.save(params["output_2"], {params["table_pi"]: pd.DataFrame(res, index = data.columns)},
+               compression=("zlib", 9))
 
 def posterior_inference(param):
     pass

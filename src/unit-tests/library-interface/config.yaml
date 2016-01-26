@@ -4,7 +4,7 @@ scoord: data/snp_coords.bed.gz
 exp: data/list_phenotypes.txt
 gcoord: data/gene_coords.bed.gz
 covar: data/list_covariates.txt
-out_avg: 1
+out_avg: 0
 sumstats:
 anchor: TSS
 cis: 5

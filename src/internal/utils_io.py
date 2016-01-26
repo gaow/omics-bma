@@ -132,7 +132,8 @@ def dict2map(value):
             if type(val[0]) == str:
                 params['vectors'][k] = val
         elif type(val) == dict:
-            params["dict"][k] = self.get_dict(val)
+            # FIXME: should write some recursive function so that the yaml can have multiple layers
+            params["dict"][k] = val
         elif val is None:
             params["None"].append(k)
         else:
