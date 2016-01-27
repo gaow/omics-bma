@@ -4,7 +4,7 @@
 import numpy as np
 
 class PosteriorCalculator(object):
-    def __init__(self):
+    def __init__(self, beta):
         pass
 
 def test_almost_equal_recursive(x, y, level = 6, level_cutoff = 3):

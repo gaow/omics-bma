@@ -136,6 +136,8 @@ public:
 
 	dict_x2_matrixf GetSstats() { return m_sstats; };
 	dict_x2_vectors GetSstatsRownames() { return m_sstats_rownames; };
+	dict_x2_matrixf GetVgs() { return m_Vgs; };
+	vectors GetSubgroups() { return m_subgroups; };
 	dict_matrixf GetSepPermPvals() { return m_sep_perm_pvals; }
 	dict_vectors GetSepPermPvalsRownames() { return m_sep_perm_pvals_rownames; }
 	matrixf GetJoinPermPvals() { return m_join_perm_pvals; }
@@ -150,6 +152,8 @@ private:
 	dict_vectors m_vs;
 	dict_x2_matrixf m_sstats;
 	dict_x2_vectors m_sstats_rownames;
+	dict_x2_matrixf m_Vgs;
+	vectors m_subgroups;
 	dict_matrixf m_sep_perm_pvals;
 	dict_vectors m_sep_perm_pvals_rownames;
 	matrixf m_join_perm_pvals;

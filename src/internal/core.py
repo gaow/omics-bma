@@ -35,7 +35,10 @@ def test_association(params):
                       rownames = exe.GetSepPermPvalsRownames()),
            "JoinPermPvals":
            map2pandas(exe.GetJoinPermPvals(), "m",
-                      rownames = exe.GetJoinPermPvalsRownames())
+                      rownames = exe.GetJoinPermPvalsRownames()),
+           "Vgs":
+           map2pandas(exe.GetVgs(), "ddm",
+                      colnames = exe.GetSubgroups())
            }
     dd.io.save(params["string"]["output"],
                dict((k, v) for k, v in res.items() if not is_empty(v)),
@@ -45,9 +48,9 @@ def fit_hm(params):
     params = InputChecker('fit_hm').apply(params)
     data = pd.concat(dd.io.load(params["output"], '/' + params["table_abf"])).\
       rename(columns = {'nb_groups' : 'null'})
+    data['null'] = 0
     # FIXME: need to implement penalized null
-    data['null'] = 1
-    res, converged = mixIP(data, control = params["optimizer_control"])
+    res, converged = mixIP(np.power(10, data), control = params["optimizer_control"])
     if not converged:
         env.error("Convex optimization for hierarchical Model did not converge!")
     # FIXME: eventually all output should be in the same file after I update deepdish with append mode
@@ -55,4 +58,6 @@ def fit_hm(params):
                compression=("zlib", 9))
 
 def posterior_inference(param):
-    pass
+    data = pd.concat(dd.io.load(params["output"], '/' + params["table_abf"])).\
+      rename(columns = {'nb_groups' : 'null'})
+    data['null'] = 1

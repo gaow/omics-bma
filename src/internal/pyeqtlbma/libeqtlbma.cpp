@@ -47,6 +47,9 @@ void pyeqtlbma::testForAssociations(
                                     const int & verbose,
                                     map<string, Gene>::iterator & itG_begin,
                                     map<string, Gene>::iterator & itG_end,
+                                    map<string,
+                                        map<string,
+                                            vector<vector<double> > > > & Vgs,
                                     size_t & nbAnalyzedGenes,
                                     size_t & nbAnalyzedPairs)
 {
@@ -90,6 +93,16 @@ void pyeqtlbma::testForAssociations(
 			likelihood, analysis, need_qnorm,
 			covariates, iGridL, iGridS, iPriorM, bfs,
 			error_model, prop_cov_errors, verbose - 1);
+		if (hasDataNotSstats) {
+			if (Vgs.find(itG->second.GetName()) == Vgs.end()) {
+				map<string, vector<vector<double> > > tmp;
+				Vgs[itG->second.GetName()] = tmp;
+			}
+
+			itG->second.CalculateVg(subgroups, samples, covariates,
+				need_qnorm, prop_cov_errors,
+				Vgs[itG->second.GetName()]);
+		}
 		++nbAnalyzedGenes;
 		nbAnalyzedPairs += itG->second.GetNbGeneSnpPairs();
 	}

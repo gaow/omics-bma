@@ -23,7 +23,6 @@ int BFCalculator::apply(const dict_x4_float & sstats,
 			return 0;
 	}
 
-	vector<string> subgroups;
 	Samples samples;
 	map<string, Snp> snp2object;
 	map<string, vector<Snp *> > mChr2VecPtSnps;
@@ -38,7 +37,7 @@ int BFCalculator::apply(const dict_x4_float & sstats,
 			m_f.at("maf"), m_s.at("covar"),
 			m_s.at("error"), m_vs.at("sbgrp"), sSnpsToKeep,
 			m_i.at("verbose"),
-			subgroups, samples, snp2object, mChr2VecPtSnps,
+			m_subgroups, samples, snp2object, mChr2VecPtSnps,
 			covariates, gene2object);
 	else
 		formatSummaryStats(sstats, m_i.at(
@@ -98,15 +97,15 @@ int BFCalculator::apply(const dict_x4_float & sstats,
 			sstats.begin()->first.empty(), mChr2VecPtSnps, m_s.at(
 				"anchor"),
 			(size_t)m_i.at("cis"),
-			subgroups, samples, m_s.at("lik"), m_s.at("analys"),
+			m_subgroups, samples, m_s.at("lik"), m_s.at("analys"),
 			(bool)m_i.at(
 				"qnorm"), covariates, iGridL, iGridS, iPriorM,
 			m_vs.at("bfs"),
 			m_s.at("error"), m_f.at("fiterr"), m_i.at("verbose"),
-			itG_begin, itG, nbAnalyzedGenes, nbAnalyzedPairs);
+			itG_begin, itG, m_Vgs, nbAnalyzedGenes, nbAnalyzedPairs);
 		if (is_perm) {
 			omp_set_num_threads(m_i.at("thread"));
-			makePermutations(subgroups, samples, m_s.at("lik"),
+			makePermutations(m_subgroups, samples, m_s.at("lik"),
 				m_s.at("analys"),
 				(bool)m_i.at(
 					"qnorm"), covariates, iGridL, iGridS, iPriorM,
@@ -122,7 +121,7 @@ int BFCalculator::apply(const dict_x4_float & sstats,
 		if (m_s.at("analys") == "sep" ||
 		    (m_s.at("analys") == "join" && sstats.begin()->first.empty() &&
 		     m_s.at("error") != "mvlr"))
-			extractResSstats(subgroups, itG_begin, itG, snp2object, m_sstats,
+			extractResSstats(m_subgroups, itG_begin, itG, snp2object, m_sstats,
 				m_sstats_rownames);
 
 		if (m_s.at("analys") == "sep" && m_i.at("nperm") > 0 &&
@@ -131,13 +130,13 @@ int BFCalculator::apply(const dict_x4_float & sstats,
 				extractResSepPermPvalSingleGroup(itG_begin, itG,
 					m_sep_perm_pvals);
 			else if (m_i.at("permsep") == 2)
-				extractResSepPermPvalMultiGroup(itG_begin, itG, subgroups,
+				extractResSepPermPvalMultiGroup(itG_begin, itG, m_subgroups,
 					m_sep_perm_pvals, m_sep_perm_pvals_rownames);
 		}
 
 
 		if (m_s.at("analys") == "join") {
-			extractResAbfs(itG_begin, itG, subgroups.size(),
+			extractResAbfs(itG_begin, itG, m_subgroups.size(),
 				iGridL, iGridS, iPriorM, m_vs.at("bfs"),
 				(bool)m_i.at("out_avg"), m_abfs,
 				m_abfs_names);

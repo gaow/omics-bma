@@ -90,7 +90,8 @@ class Map2DataFrame(object):
         for k1, val1 in list(dict(value).items()):
             res[k1] = {}
             for k2, val2 in list(dict(val1).items()):
-                res[k1][k2] = pd.DataFrame(np.matrix(val2), index = rownames[k1][k2],
+                res[k1][k2] = pd.DataFrame(np.matrix(val2),
+                                           index = rownames[k1][k2] if rownames is not None else None,
                                            columns = colnames)
         return res
 

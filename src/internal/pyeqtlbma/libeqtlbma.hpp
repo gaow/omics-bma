@@ -60,6 +60,8 @@ void testForAssociations(
 	const int & verbose,
 	std::map<std::string, quantgen::Gene>::iterator & itG_begin,
 	std::map<std::string, quantgen::Gene>::iterator & itG_end,
+	std::map<std::string, std::map<std::string,
+	                               std::vector<std::vector<double> > > > & Vgs,
 	size_t & nbAnalyzedGenes,
 	size_t & nbAnalyzedPairs);
 
