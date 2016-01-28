@@ -1,0 +1,31 @@
+import os
+configfile: "config.yaml"
+pkg = os.path.abspath(config['pkg'])
+
+rule simulation:
+  output:
+    touch("simulation.done")
+  shell:
+    '''Rscript {config[pkg]}/scripts/tutorial_eqtlbma.R --pkg {pkg} \
+    --coverr 0 --ngenes 200 --asg 10 --pi0 0.3 --nsbgrps 3 >& stdout_tutorial_eqtlbma.txt;
+    eqtlbma_bf --geno list_genotypes.txt --scoord snp_coords.bed.gz \
+    --exp list_explevels.txt --gcoord gene_coords.bed.gz --anchor TSS --cis 1000 \
+    --out out_eqtlbma --analys join --covar list_covariates.txt \
+    --gridL grid_phi2_oma2_general.txt --gridS grid_phi2_oma2_with-configs.txt --bfs all \
+    --error uvlr --outss >& stdout_eqtlbma_bf.txt;
+    eqtlbma_hm --data "out_eqtlbma_l10abfs_raw.txt.gz" --nsubgrp 3 --dim 7 \
+    --ngrid 10 --out out_eqtlbma_hm.txt.gz >& stdout_eqtlbma_hm.txt;
+    zcat out_eqtlbma_hm.txt.gz | grep "#grid" | cut -f2 > grid_weights.txt;
+    zcat out_eqtlbma_hm.txt.gz | grep "#config" \
+    | awk '{{split($1,a,"."); print a[2]"\\t"$2}}' > config_weights.txt;
+    eqtlbma_avg_bfs --in "out_eqtlbma_l10abfs_raw.txt.gz" --gwts grid_weights.txt \
+    --nsubgrp 3 --dim 7 --cwts config_weights.txt --save post --pi0 0.3 --post a+b+c+d --bestdim \
+    --alldim --out out_eqtlbma_avg_bfs.txt.gz >& stdout_eqtlbma_avg_bfs.txt
+    '''
+
+rule all:
+  input:
+    "simulation.done"
+
+rule clean:
+  shell: "rm -f *.done"
