@@ -102,7 +102,7 @@ int BFCalculator::apply(const dict_x4_float & sstats,
 				"qnorm"), covariates, iGridL, iGridS, iPriorM,
 			m_vs.at("bfs"),
 			m_s.at("error"), m_f.at("fiterr"), m_i.at("verbose"),
-			itG_begin, itG, m_Vgs, nbAnalyzedGenes, nbAnalyzedPairs);
+			itG_begin, itG, m_beta_n_cov, nbAnalyzedGenes, nbAnalyzedPairs);
 		if (is_perm) {
 			omp_set_num_threads(m_i.at("thread"));
 			makePermutations(m_subgroups, samples, m_s.at("lik"),

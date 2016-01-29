@@ -49,7 +49,7 @@ void pyeqtlbma::testForAssociations(
                                     map<string, Gene>::iterator & itG_end,
                                     map<string,
                                         map<string,
-                                            vector<vector<double> > > > & Vgs,
+                                            vector<vector<double> > > > & beta_n_cov,
                                     size_t & nbAnalyzedGenes,
                                     size_t & nbAnalyzedPairs)
 {
@@ -93,16 +93,16 @@ void pyeqtlbma::testForAssociations(
 			likelihood, analysis, need_qnorm,
 			covariates, iGridL, iGridS, iPriorM, bfs,
 			error_model, prop_cov_errors, verbose - 1);
-		if (hasDataNotSstats) {
-			if (Vgs.find(itG->second.GetName()) == Vgs.end()) {
-				map<string, vector<vector<double> > > tmp;
-				Vgs[itG->second.GetName()] = tmp;
-			}
-
-			itG->second.CalculateVg(subgroups, samples, covariates,
-				need_qnorm, prop_cov_errors,
-				Vgs[itG->second.GetName()]);
+		// summary statistics for posterior effect size inference
+		if (beta_n_cov.find(itG->second.GetName()) == beta_n_cov.end()) {
+			map<string, vector<vector<double> > > tmp;
+			beta_n_cov[itG->second.GetName()] = tmp;
 		}
+
+		itG->second.CalcSstatsHybrid(subgroups, samples, covariates,
+			need_qnorm, prop_cov_errors,
+			beta_n_cov[itG->second.GetName()]);
+		//
 		++nbAnalyzedGenes;
 		nbAnalyzedPairs += itG->second.GetNbGeneSnpPairs();
 	}

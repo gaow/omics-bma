@@ -61,7 +61,7 @@ void testForAssociations(
 	std::map<std::string, quantgen::Gene>::iterator & itG_begin,
 	std::map<std::string, quantgen::Gene>::iterator & itG_end,
 	std::map<std::string, std::map<std::string,
-	                               std::vector<std::vector<double> > > > & Vgs,
+	                               std::vector<std::vector<double> > > > & beta_n_cov,
 	size_t & nbAnalyzedGenes,
 	size_t & nbAnalyzedPairs);
 

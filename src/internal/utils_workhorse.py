@@ -5,6 +5,7 @@ import pandas as pd
 import deepdish as dd
 from .utils_io import get_tb_groups, load_priors
 from .utils_math import SnpPosteriorCalculator, BlockPosteriorCalculator
+import os
 
 class PosteriorController(object):
     def __init__(self, sumstats_path, cov_path, bf_path, prior_path, weights_path, params_path):
@@ -22,6 +23,7 @@ class PosteriorController(object):
         self.sumstats = sumstats_path
         self.cov = cov_path
         self.bf = bf_path
+        self.tmp_snps = None
 
     def ScanBlocks(self, block_list):
         '''
@@ -39,5 +41,14 @@ class PosteriorController(object):
             res[item] = self.__CalcBlock(item)
         return res
 
-    def __CalcBlock(self, block)
-        # For each block I need to extract BFs, betahat and vhat and match them by SNP_ID
+    def __CalcBlock(self, block_name):
+        '''
+        For each block extract BFs, betahat and vhat and match them by SNP_ID
+        '''
+        # bfs is a matrix with SNP ID as row names
+        bfs = dd.io.load(self.bf[0], os.path.join(self.bf[1], block_name))
+        # vhat is a dictionary with SNP ID as keys
+        vhat = dd.io.load(self.cov[0], os.path.join(self.cov[1], block_name))
+        betahat = {}
+        # for sbgrp, ss in dd.io.load(self.sumstats[0], os.path.join(self.sumstats[1], block_name)).items():
+            # for

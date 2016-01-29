@@ -36,9 +36,9 @@ def test_association(params):
            "JoinPermPvals":
            map2pandas(exe.GetJoinPermPvals(), "m",
                       rownames = exe.GetJoinPermPvalsRownames()),
-           "Vgs":
-           map2pandas(exe.GetVgs(), "ddm",
-                      colnames = exe.GetSubgroups())
+           "JoinSstats":
+           map2pandas(exe.GetJoinSstats(), "ddm",
+                      rownames = exe.GetJoinSstatsRownames())
            }
     dd.io.save(params["string"]["output"],
                dict((k, v) for k, v in res.items() if not is_empty(v)),

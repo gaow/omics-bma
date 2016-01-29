@@ -5,7 +5,7 @@
 #define __PYBEQTLBMA_H_
 
 #include "libeqtlbma.hpp"
-
+#include <algorithm>
 namespace pyeqtlbma {
 
 typedef std::vector<int> vectori;
@@ -136,7 +136,15 @@ public:
 
 	dict_x2_matrixf GetSstats() { return m_sstats; };
 	dict_x2_vectors GetSstatsRownames() { return m_sstats_rownames; };
-	dict_x2_matrixf GetVgs() { return m_Vgs; };
+	dict_x2_matrixf GetJoinSstats() { return m_beta_n_cov; };
+	vectors GetJoinSstatsRownames()
+	{
+		vectors res(m_subgroups.size() + 1);
+
+		res[0] = "betahat";
+		std::copy(m_subgroups.begin(), m_subgroups.end(), res.begin() + 1);
+		return res;
+	};
 	vectors GetSubgroups() { return m_subgroups; };
 	dict_matrixf GetSepPermPvals() { return m_sep_perm_pvals; }
 	dict_vectors GetSepPermPvalsRownames() { return m_sep_perm_pvals_rownames; }
@@ -152,7 +160,7 @@ private:
 	dict_vectors m_vs;
 	dict_x2_matrixf m_sstats;
 	dict_x2_vectors m_sstats_rownames;
-	dict_x2_matrixf m_Vgs;
+	dict_x2_matrixf m_beta_n_cov;
 	vectors m_subgroups;
 	dict_matrixf m_sep_perm_pvals;
 	dict_vectors m_sep_perm_pvals_rownames;

@@ -7,7 +7,7 @@ import pandas as pd
 import re
 from .utils import env, rename_stamp
 import tables as tb
-from .pyeqtlbma import get_eqtlbma_configurations
+from .pyeqtlbma import get_eqtlbma_configurations, dict_x2_vectors
 
 def str2list(value):
     return [x.strip() for x in re.split(" |\+|,", value) if x.strip()]
@@ -95,7 +95,7 @@ class Map2DataFrame(object):
             res[k1] = {}
             for k2, val2 in list(dict(val1).items()):
                 res[k1][k2] = pd.DataFrame(np.matrix(val2),
-                                           index = rownames[k1][k2] if rownames is not None else None,
+                                           index = rownames[k1][k2] if type(rownames) is dict_x2_vectors else rownames,
                                            columns = colnames)
         return res
 
@@ -149,7 +149,7 @@ def dict2map(value):
     return params
 
 
-def get_tb_grps(filenames, group_name = None, verbose = True):
+def get_tb_groups(filenames, group_name = None, verbose = True):
     if verbose:
         env.log('Collecting group names from input files ...')
     names = set()
