@@ -162,5 +162,8 @@ private:
 	dict_vectors m_abfs_names;
 };
 
+dict_vectori get_eqtlbma_configurations(const size_t & nb_subgroups,
+	const bool & is_all);
+
 }
 #endif

@@ -9,7 +9,7 @@ from .utils_io import InputChecker, map2pandas, load_ddm
 from .utils import is_empty, env
 from .pyeqtlbma import BFCalculator
 from .mix_opt import mixIP
-from .utils_math import PosteriorCalculator
+from .utils_workhorse import PosteriorController
 
 def test_association(params):
     params = InputChecker('test_association').apply(params)

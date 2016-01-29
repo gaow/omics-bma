@@ -6,13 +6,6 @@ import pandas as pd
 from numpy.linalg import inv
 from scipy.stats import multivariate_normal
 
-class SnpPosteriorController(object):
-    def __init__(self, sumstats_path, cov_path, bf_path, prior_path, weights_path):
-        '''each path variable is a tuple of (HDF5 file name, table name)
-        the controller should get data and make sure they are properly matched'''
-        pass
-
-
 class SnpPosteriorCalculator(object):
     '''Calculate SNP specific posterior quantities'''
     def __init__(self, priors, w_prior):
@@ -80,7 +73,6 @@ class SnpPosteriorCalculator(object):
                         enumerate(np.split(bfs, partition_by), np.split(self.w_priors, partition_by))]
         self.Uk_weights = weighted_bfs / sum(bfs)
 
-
     def Calclikelihood(self, betahat, vhat):
         '''
         Input
@@ -91,10 +83,10 @@ class SnpPosteriorCalculator(object):
         ------
         L: likelihood
         '''
-        likelihoods = [multivariate_normal.pdf(betahat, np.zeros(vhat.shape[0]), p + vhat) for p in self.priors]
+        likelihoods = [multivariate_normal.pdf(betahat, np.zeros(vhat.shape[0]), p + vhat)
+                       for p in self.priors]
         self.likelihood = np.average(likelihoods, weights = self.w_prior)
         # Note: likelihoods / self.likelihood should equal self.posterior_weights
-
 
     def CalcPosterior(self, betahat, vhat, bfs):
         '''

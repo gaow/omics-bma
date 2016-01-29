@@ -169,4 +169,44 @@ int BFCalculator::apply(const dict_x4_float & sstats,
 }
 
 
+dict_vectori get_eqtlbma_configurations(const size_t & nb_subgroups,
+                                        const bool & is_all)
+{
+	gsl_combination * comb;
+	dict_vectori res;
+
+	for (size_t k = 1; k <= nb_subgroups; ++k) {
+		comb = gsl_combination_calloc(nb_subgroups, k);
+		if (comb == NULL) {
+			cerr	<<
+			    "ERROR: can't allocate memory for the combination"
+			        << endl;
+		}
+		while (true) {
+			stringstream config_name;
+			vectori gamma(nb_subgroups, 0);
+
+			config_name << gsl_combination_get(comb, 0) + 1;
+			gamma[gsl_combination_get(comb, 0)] = 1;
+
+			if (comb->k > 1) {
+				for (size_t i = 1; i < comb->k; ++i) {
+					config_name << "-" << gsl_combination_get(comb, i) + 1;
+					gamma[gsl_combination_get(comb, i)] = 1;
+				}
+			}
+
+			res[config_name.str()] = gamma;
+
+			if (gsl_combination_next(comb) != GSL_SUCCESS)
+				break;
+		}
+		gsl_combination_free(comb);
+		if (!is_all)
+			break;
+	}
+	return res;
+}
+
+
 }
