@@ -18,7 +18,7 @@ class InputChecker:
             self.apply = self.check_association_input
         elif procedure == 'fit_hm':
             self.apply = self.check_fit_hm_input
-        elif procedure == 'posterior_inference':
+        elif procedure == 'calculate_posterior':
             self.apply = self.check_posterior_inference_input
         else:
             env.error("Undefined procedure for input check %s" % procedure, exit = True)
@@ -59,6 +59,10 @@ class InputChecker:
         return params
 
     def check_posterior_inference_input(self, params):
+        try:
+            params["output"] = rename_stamp(re.match(r'stamp\((.*)\)', params["output"]).group(1))
+        except AttributeError:
+            pass
         return params
 
 def map2pandas(data, to_obj, rownames = None, colnames = None):
@@ -148,12 +152,11 @@ def dict2map(value):
             pass
     return params
 
-
 def get_tb_groups(filenames, group_name = None, verbose = True):
     if verbose:
         env.log('Collecting group names from input files ...')
     names = set()
-    for filename in filenames:
+    for filename in filenames if type(filenames) is list else [filenames]:
         if verbose:
             env.log(filename, flush = True)
         with tb.open_file(filename) as f:
@@ -161,7 +164,7 @@ def get_tb_groups(filenames, group_name = None, verbose = True):
                           (f.root if group_name is None else getattr(f.root, '{}'.format(group_name)))])
         if verbose:
             env.log('%s unique groups identified from %s files\n' \
-                    % (len(names), len(filenames)), flush = True)
+                    % (len(names), len(filenames) if type(filenames) is list else 1), flush = True)
     return sorted(names)
 
 def load_priors(prior_path, dim, config):

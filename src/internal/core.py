@@ -50,14 +50,18 @@ def fit_hm(params):
       rename(columns = {'nb_groups' : 'null'})
     data['null'] = 0
     # FIXME: need to implement penalized null
+    # FIXME: need to use BF at original scale
     res, converged = mixIP(np.power(10, data), control = params["optimizer_control"])
     if not converged:
         env.error("Convex optimization for hierarchical Model did not converge!")
     # FIXME: eventually all output should be in the same file after I update deepdish with append mode
-    dd.io.save(params["output_2"], {params["table_pi"]: pd.DataFrame(res, index = data.columns)},
+    dd.io.save(params["output_2"], {params["table_pi"]: pd.Series(res, index = data.columns)},
                compression=("zlib", 9))
 
-def posterior_inference(param):
-    data = pd.concat(dd.io.load(params["output"], '/' + params["table_abf"])).\
-      rename(columns = {'nb_groups' : 'null'})
-    data['null'] = 1
+def calculate_posterior(params):
+    params = InputChecker('calculate_posterior').apply(params)
+    # FIXME: all these names
+    pc = PosteriorController((params["output"], "/JoinSstats"), (params["output"], "/Abfs"),
+                             (params["priors"], "/"), (params["output_2"], "/" + params["table_pi"]),
+                             (params["output_3"], "/"), params)
+    pc.ScanBlocks()

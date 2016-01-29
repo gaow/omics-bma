@@ -1,4 +1,4 @@
-from OmicsBMA.core import test_association, fit_hm
+from OmicsBMA.core import test_association, fit_hm, calculate_posterior
 
 configfile: "config.yaml"
 
@@ -18,9 +18,17 @@ rule fit_hm:
   run:
     fit_hm(config)
 
+rule calculate_posterior:
+  threads:
+    config['thread']
+  output:
+    touch("calc_posterior.done")
+  run:
+    calculate_posterior(config)
+
 rule all:
   input:
-    "test_association.done", "fit_hm.done"
+    "test_association.done", "fit_hm.done", "calc_posterior.done"
 
 rule clean:
   shell: "rm -f *.done"

@@ -1,31 +1,31 @@
 #! /usr/bin/env python3
 # utils_workhorse.py
 # Gao Wang (c) 2015
-import pandas as pd
+import numpy as np
 import deepdish as dd
+import os
 from .utils_io import get_tb_groups, load_priors
 from .utils_math import SnpPosteriorCalculator, BlockPosteriorCalculator
-import os
 
 class PosteriorController(object):
-    def __init__(self, sumstats_path, cov_path, bf_path, prior_path, weights_path, params_path):
+    def __init__(self, sumstats_path, bf_path, prior_path, weights_path, output_path, config):
         '''each path variable is a tuple of (HDF5 file name, table name)
         the controller should get data, make sure they are properly matched,
         feed into calculators and collect results'''
         # FIXME: check path, should not be too deep!
-        self.params = dd.io.load(params_path[0], params_path[1])
-        priors = load_priors(prior_path, self.params['nb_groups'], self.params['bf_config'])
+        priors = load_priors(prior_path, config['nb_groups'], config['bf_config'])
         weights = dd.io.load(weights_path[0], weights_path[1]).to_dict()
-        self.Uk_names = sorted(self.weights.keys())
-        self.SnpCalculator = SnpPosteriorCalculator([priors[k] for k in self.Uk_names],
-                                                    [weights[k] for k in self.Uk_names])
+        self.Uk_names, self.Uk_classes, self.Uk_partitions = self.__SortUkNames(list(weights.keys()))
+        self.SnpCalculator = SnpPosteriorCalculator(np.array([priors[k] for k in self.Uk_names]),
+                                                    np.array([weights[k] for k in self.Uk_names]),
+                                                    self.Uk_classes, self.Uk_partitions)
         self.BlockCalculator = BlockPosteriorCalculator(weights['null'])
         self.sumstats = sumstats_path
-        self.cov = cov_path
         self.bf = bf_path
-        self.tmp_snps = None
+        self.output = output_path
+        self.blocks = get_tb_groups(sumstats_path[0], sumstats_path[1])
 
-    def ScanBlocks(self, block_list):
+    def ScanBlocks(self):
         '''
         Input
         -----
@@ -37,18 +37,46 @@ class PosteriorController(object):
         '''
         # FIXME: single core implementation for now. will move to multiple cores down the line
         res = {}
-        for item in block_list:
+        for item in self.blocks:
             res[item] = self.__CalcBlock(item)
-        return res
+        dd.io.save(self.output[0], res)
 
     def __CalcBlock(self, block_name):
         '''
         For each block extract BFs, betahat and vhat and match them by SNP_ID
         '''
-        # bfs is a matrix with SNP ID as row names
-        bfs = dd.io.load(self.bf[0], os.path.join(self.bf[1], block_name))
-        # vhat is a dictionary with SNP ID as keys
-        vhat = dd.io.load(self.cov[0], os.path.join(self.cov[1], block_name))
-        betahat = {}
-        # for sbgrp, ss in dd.io.load(self.sumstats[0], os.path.join(self.sumstats[1], block_name)).items():
-            # for
+        res = {}
+        # bfs is a matrix with SNP ID as row names and Uk as columns, rearranged here column-wise
+        bfs = dd.io.load(self.bf[0], os.path.join(self.bf[1], block_name)).\
+          rename(columns = {'nb_groups' : 'null'})
+        bfs = bfs[self.Uk_names]
+        # FIXME: need BF input in original scale not log scale
+        bfs['null'] = 0
+        # sumstats is a dictionary with SNP ID as keys
+        sumstats = dd.io.load(self.sumstats[0], os.path.join(self.sumstats[1], block_name))
+        for snp in list(bfs.index):
+            # FIXME: need BF input in original scale not log scale
+            bfs_snp = np.power(10, bfs.loc[snp]).as_matrix()
+            betahat = np.matrix(sumstats[snp][0:1])
+            vhat = np.matrix(sumstats[snp][1:])
+            self.SnpCalculator.Calclikelihood(betahat, vhat)
+            self.SnpCalculator.CalcPosterior(betahat, vhat, bfs_snp)
+            res[snp] = self.SnpCalculator.GetResults()
+        return res
+
+    def __SortUkNames(self, names):
+        res = {}
+        res_names = []
+        res_counts = []
+        for x in names:
+            key = os.path.splitext(x)[0]
+            if key not in res:
+                res[key] = []
+            res[key].append(x)
+        #
+        classes = sorted(res.keys())
+        classes.insert(0, classes.pop(classes.index('null')))
+        for key in classes:
+            res_names.extend(sorted(res[key]))
+            res_counts.append(len(res[key]))
+        return res_names, classes, np.cumsum(res_counts[:-1])

@@ -32,3 +32,7 @@ output: stamp(output/test_association.h5)
 table_abf: Abfs
 output_2: weights.h5
 table_pi: pi
+output_3: posterior.h5
+table_posterior: posterior
+nb_groups: 3
+bf_config: sin
