@@ -5,65 +5,10 @@ import numpy as np
 import deepdish as dd
 import pandas as pd
 import re
-from .utils import env, rename_stamp
+from .utils import env, rename_stamp, flatten_dict, is_null
 import tables as tb
 from .pyeqtlbma import get_eqtlbma_configurations, dict_x2_vectors
 
-def str2list(value):
-    return [x.strip() for x in re.split(" |\+|,", value) if x.strip()]
-
-class InputChecker:
-    def __init__(self, procedure):
-        if procedure == 'test_association':
-            self.apply = self.check_association_input
-        elif procedure == 'fit_hm':
-            self.apply = self.check_fit_hm_input
-        elif procedure == 'calculate_posterior':
-            self.apply = self.check_posterior_inference_input
-        else:
-            env.error("Undefined procedure for input check %s" % procedure, exit = True)
-
-    def check_association_input(self, params):
-        #
-        if "bfs" in params:
-            params["bfs"] = str2list(params["bfs"])
-        else:
-            params["bfs"] = ["gen"]
-        #
-        params["sbgrp"] = str2list(params["sbgrp"])
-        #
-        if params["sumstats"] is not None and params["sumstats"] != 'None':
-            params["sumstats"] = str2list(params["sumstats"])
-            if len(params["sumstats"]) != 2:
-                env.error("Parameter 'sumstats' should have 2 elements: filename, data_path", exit = True)
-            if not params["sumstats"][1].startswith("/"):
-                params["sumstats"][1] = "/" + params["sumstats"][1]
-        #
-        if "wrtsize" not in params:
-            params["wrtsize"] = 10
-        try:
-            params["output"] = rename_stamp(re.match(r'stamp\((.*)\)', params["output"]).group(1))
-        except AttributeError:
-            pass
-        return dict2map(params)
-
-    def check_fit_hm_input(self, params):
-        try:
-            params["output"] = rename_stamp(re.match(r'stamp\((.*)\)', params["output"]).group(1))
-        except AttributeError:
-            pass
-        if not 'optimizer_control' in params:
-            params['optimizer_control'] = {}
-        if "thread" in params:
-            params['optimizer_control']['iparam.num_threads'] = params['thread']
-        return params
-
-    def check_posterior_inference_input(self, params):
-        try:
-            params["output"] = rename_stamp(re.match(r'stamp\((.*)\)', params["output"]).group(1))
-        except AttributeError:
-            pass
-        return params
 
 def map2pandas(data, to_obj, rownames = None, colnames = None):
     return Map2DataFrame(to_obj).convert(data, rownames, colnames)
@@ -211,3 +156,106 @@ def load_priors(prior_path, dim, config):
             np.fill_diagonal(res["cfg.{}.{}".format(k, idx + 1)], np.sum(item))
             res["cfg.{}.{}".format(k, idx + 1)][np.where(np.outer(value, value) == 0)] = 0
     return res
+
+def str2list(value):
+    if value is None:
+        return []
+    else:
+        return [x.strip() for x in re.split(" |\+|,", value) if x.strip()]
+
+class ConfigReader(dict):
+    def __init__(self, params):
+        self.update({'association_data': None,
+                     'input_sumstats_data': None,
+                     'mixture_weights_data': None,
+                     'posterior_data': None,
+                     'extract_average_bf_per_class': 0,
+                     'permsep': 0,
+                     'trick': 0,
+                     'nperm': 100,
+                     'tricut': 10,
+                     'maxbf': 0,
+                     'pbf': 'all',
+                     'gcoord': None,
+                     'snp': None,
+                     'geno': None,
+                     'sbgrp': None,
+                     'covar': None,
+                     'output_sumstats_data': None,
+                     'exp': None,
+                     'prior_data': None,
+                     'scoord': None,
+                     'bf_config': 'sin',
+                     'nb_groups': None,
+                     'verbose': 1,
+                     'seed': 10086,
+                     'thread': 4,
+                     'fiterr': 0.5,
+                     'anchor': 'TSS',
+                     'error': None,
+                     'qnorm': 1,
+                     'maf': None,
+                     'analys': None,
+                     'lik': 'normal',
+                     'bfs': 'sin',
+                     'cis': 1000})
+        self.update(flatten_dict(params))
+        self.check_input()
+        self.check_output()
+        self.check_analysis()
+        self.check_permutation()
+        self.check_runtime()
+        self.check_others()
+
+    def check_input(self):
+        params["sbgrp"] = str2list(params["sbgrp"])
+        if not is_null(params["sumstats"]):
+            params["sumstats"] = str2list(params["sumstats"])
+            if len(params["sumstats"]) != 2:
+                env.error("Parameter 'sumstats' should have 2 elements: filename, data_path", exit = True)
+            if not params["sumstats"][1].startswith("/"):
+                params["sumstats"][1] = "/" + params["sumstats"][1]
+        #
+
+    def check_output(self):
+        pass
+
+    def check_analysis(self):
+        params["bfs"] = str2list(params["bfs"])
+
+    def check_permutation(self):
+        pass
+
+    def check_runtime(self):
+        pass
+
+    def check_others(self):
+        pass
+
+        #
+        #
+        if "wrtsize" not in params:
+            params["wrtsize"] = 10
+        try:
+            params["output"] = rename_stamp(re.match(r'stamp\((.*)\)', params["output"]).group(1))
+        except AttributeError:
+            pass
+        return dict2map(params)
+
+    def check_fit_hm_input(self, params):
+        try:
+            params["output"] = rename_stamp(re.match(r'stamp\((.*)\)', params["output"]).group(1))
+        except AttributeError:
+            pass
+        if not 'optimizer_control' in params:
+            params['optimizer_control'] = {}
+        if "thread" in params:
+            params['optimizer_control']['iparam.num_threads'] = params['thread']
+        return params
+
+    def check_posterior_inference_input(self, params):
+        try:
+            params["output"] = rename_stamp(re.match(r'stamp\((.*)\)', params["output"]).group(1))
+        except AttributeError:
+            pass
+        return params

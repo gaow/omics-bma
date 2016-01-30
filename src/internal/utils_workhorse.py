@@ -62,6 +62,7 @@ class PosteriorController(object):
             self.SnpCalculator.Calclikelihood(betahat, vhat)
             self.SnpCalculator.CalcPosterior(betahat, vhat, bfs_snp)
             res[snp] = self.SnpCalculator.GetResults()
+        # FIXME: block level posterior not saved yet
         return res
 
     def __SortUkNames(self, names):

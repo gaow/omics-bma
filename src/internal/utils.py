@@ -5,7 +5,7 @@ import sys, os, subprocess, shutil, glob, shlex, re, hashlib, tempfile, datetime
 from io import StringIO
 from contextlib import contextmanager
 import itertools
-from collections import OrderedDict, defaultdict, Counter
+from collections import OrderedDict, defaultdict, Counter, MutableMapping
 import pandas as pd
 
 class Environment:
@@ -16,7 +16,6 @@ class Environment:
         self.debug = False
         self.quiet = False
         self.colors = "#377EB8 #E41A1C #4DAF4A #984EA3 #FFD92F #FF7F00 #F781BF #8DD3C7 #B3B3B3 #000000 #56B4E9 #BC80BD #FDB462 #350E20 #8A9045 #800000".split()
-
 
     def error(self, msg = None, show_help = False, exit = False):
         if msg is None:
@@ -356,6 +355,8 @@ def physicalMemory():
             return None
 
 def get_value_type(x):
+    if x is None:
+        return 'null'
     if x.lower() in ['na','nan','null','none']:
         x = 'nan'
     try:
@@ -367,6 +368,14 @@ def get_value_type(x):
             return 'float'
         except:
             return 'string'
+
+def is_null(x):
+    if x is None:
+        return True
+    if type(x) is str:
+        if x.lower() in ['na','nan','null','none']:
+            return True
+    return False
 
 class StdoutCapturer(list):
     def __enter__(self):
@@ -496,7 +505,6 @@ def replace_non_alnum(x):
     trans = ''.join(chr(c) if chr(c).isalnum() else '_' for c in range(256))
     x.translate(trans)
 
-
 class Timer(object):
     def __init__(self, verbose=False):
         self.verbose = verbose
@@ -511,3 +519,12 @@ class Timer(object):
         self.msecs = self.secs * 1000  # millisecs
         if self.verbose:
             print('elapsed time: %.03f ms' % self.msecs)
+
+def flatten_dict(d):
+    items = []
+    for k, v in d.items():
+        if isinstance(v, MutableMapping):
+            items.extend(flatten_dict(v).items())
+        else:
+            items.append((k, v))
+    return dict(items)

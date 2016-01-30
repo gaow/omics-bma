@@ -138,7 +138,7 @@ int BFCalculator::apply(const dict_x4_float & sstats,
 		if (m_s.at("analys") == "join") {
 			extractResAbfs(itG_begin, itG, m_subgroups.size(),
 				iGridL, iGridS, iPriorM, m_vs.at("bfs"),
-				(bool)m_i.at("out_avg"), m_abfs,
+				(bool)m_i.at("extract_average_bf_per_class"), m_abfs,
 				m_abfs_names);
 		}
 

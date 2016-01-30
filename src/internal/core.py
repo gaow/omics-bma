@@ -5,14 +5,15 @@ import os
 import numpy as np
 import pandas as pd
 import deepdish as dd
-from .utils_io import InputChecker, map2pandas, load_ddm
+from .utils_io import ConfigReader, map2pandas, load_ddm
 from .utils import is_empty, env
 from .pyeqtlbma import BFCalculator
 from .mix_opt import mixIP
 from .utils_workhorse import PosteriorController
 
+
 def test_association(params):
-    params = InputChecker('test_association').apply(params)
+    params = ConfigReader(params)
     try:
         fn = params["vectors"]["sumstats"]
         sumstats = load_ddm(fn[0], fn[1])
@@ -45,10 +46,12 @@ def test_association(params):
                compression=("zlib", 9))
 
 def fit_hm(params):
-    params = InputChecker('fit_hm').apply(params)
+    params = ConfigReader(params)
     data = pd.concat(dd.io.load(params["output"], '/' + params["table_abf"])).\
       rename(columns = {'nb_groups' : 'null'})
     data['null'] = 0
+    if params['extract_average_bf_per_class']:
+        data = data[[x for x in data.columns if not x.endswith('.avg')]]
     # FIXME: need to implement penalized null
     # FIXME: need to use BF at original scale
     res, converged = mixIP(np.power(10, data), control = params["optimizer_control"])
@@ -59,7 +62,7 @@ def fit_hm(params):
                compression=("zlib", 9))
 
 def calculate_posterior(params):
-    params = InputChecker('calculate_posterior').apply(params)
+    params = ConfigReader(params)
     # FIXME: all these names
     pc = PosteriorController((params["output"], "/JoinSstats"), (params["output"], "/Abfs"),
                              (params["priors"], "/"), (params["output_2"], "/" + params["table_pi"]),
