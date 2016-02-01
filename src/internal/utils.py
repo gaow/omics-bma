@@ -7,6 +7,9 @@ from contextlib import contextmanager
 import itertools
 from collections import OrderedDict, defaultdict, Counter, MutableMapping
 import pandas as pd
+from .pyper import R as RClass
+
+R = RClass()
 
 class Environment:
     def __init__(self):
