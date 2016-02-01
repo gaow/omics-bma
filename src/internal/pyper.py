@@ -5,7 +5,7 @@
 PypeR is free software subjected to the GPL license 3.0. and comes with
 ABSOLUTELY NO WARRANT. This package provides a light-weight interface to use R
 in Python by pipe.  It can be used on multiple platforms since it is written in
-pure python. 
+pure python.
 
 Prerequisites:
     1. Python 2.3 or later is required.
@@ -198,7 +198,7 @@ if has_numpy:
 else:
     FloatStr = repr
 
-def LongStr(obj):  
+def LongStr(obj):
     rv = repr(obj)
     if rv[-1] == 'L':
         rv = rv[:-1]
@@ -247,9 +247,9 @@ def DictStr(obj):
 
 # 'b':boolean, 'i':integer, 'u':unsigned int, 'f':float, c complex-float
 # 'S'/'a':string, 'U':unicode, 'V':raw data. 'O':string?
-_tpdic = {'i':'as.integer(c(%s))', 'u':'as.integer(c(%s))', 'f':'as.double(c(%s))', 'c':'as.complex(c(%s))', 
+_tpdic = {'i':'as.integer(c(%s))', 'u':'as.integer(c(%s))', 'f':'as.double(c(%s))', 'c':'as.complex(c(%s))',
         'b':'c(%s)', 'S':'c(%s)', 'a':'c(%s)', 'U':'c(%s)', 'V':'list(%s)', 'O':'as.character(c(%s))'}
-def getVec(ary): 
+def getVec(ary):
     # used for objects from numpy and pandas
     tp = ary.dtype.kind
     if len(ary.shape) > 1:
@@ -304,11 +304,11 @@ def OtherStr(obj):
             return(SeqStr(list(obj)))
     return(repr(obj))
 
-str_func = {type(None): NoneStr, bool: BoolStr, long: LongStr, int: repr, float: FloatStr, complex: ComplexStr, 
+str_func = {type(None): NoneStr, bool: BoolStr, long: LongStr, int: repr, float: FloatStr, complex: ComplexStr,
         unicode: UniStr, str: repr, list: SeqStr, tuple: SeqStr, set: SeqStr, frozenset: SeqStr, dict: DictStr} # str will override uncode in Python 3
 
 base_tps = [type(None), bool, int, long, float, complex, str, unicode, list, tuple, set, frozenset, dict] # use type(None) instead of NoneType since the latter cannot be found in the types module in Python 3
-if has_numpy: 
+if has_numpy:
     str_func[numpy.ndarray] = NumpyNdarrayStr
     base_tps.append(numpy.ndarray)
 if has_pandas:
@@ -320,11 +320,11 @@ if _in_py3:
     base_tps.append(bytes)
     str_func[bytes] = ByteStr
 
-def Str4R(obj):  
+def Str4R(obj):
     '''
     convert a Python basic object into an R object in the form of string.
     '''
-    #return str_func.get(type(obj), OtherStr)(obj) 
+    #return str_func.get(type(obj), OtherStr)(obj)
     # for objects known by PypeR
     if type(obj) in str_func:
         return(str_func[type(obj)](obj))
@@ -421,7 +421,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
     DataFrameStr <- function(x) {
         if (ncol(x) == 0) {
             if (has_pandas) return('pandas.DataFrame()')
-            if (has_numpy) return('numpy.array([])') 
+            if (has_numpy) return('numpy.array([])')
             return('[]')}
         if (has_numpy) {
             cnms <- colnames(x) # get column names
@@ -447,11 +447,11 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
                 if (length(special_locs) > 0) xi <- SpecialVals(xi, special_locs)
                 if (nrow(x) > 0) x[[i]] <- xi }
             tailstr <- paste(', dtype=[', paste(ctp, collapse=','), ']', tailstr, sep='') }
-        else if (nrow(x) > 0) 
+        else if (nrow(x) > 0)
             for (i in seq(x)) {
                 xi <- as.vector(x[[i]])
                 special_locs <- SpecialLocs(xi)
-                if (is.character(xi)) xi <- paste('"', xi, '"', sep='') 
+                if (is.character(xi)) xi <- paste('"', xi, '"', sep='')
                 else if (is.logical(xi)) xi <- ifelse(xi, 'True', 'False')
                 else if (is.integer(xi)) xi <- paste(xi)
                 else if (is.double(xi)) xi <- paste(xi)
@@ -470,11 +470,11 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
     zipVecWithName <- function(x, nms) {
         if (!is.null(nms) &&  length(nms)>0) {
             nms <- paste('"', nms, '"', sep='')
-            x <- sapply(seq(nms), function(i) paste('(', nms[i], ',', x[i], ')') ) 
+            x <- sapply(seq(nms), function(i) paste('(', nms[i], ',', x[i], ')') )
             if (identical(use_dict, TRUE)) x <- paste('dict([', paste(x, collapse=','), '])', sep='')
             else if (identical(use_dict, FALSE))  x <- paste('[', paste(x, collapse=','), ']', sep='')
             else { # should be NULL or something else
-                if (any(duplicated(nms))) x <- paste('[', paste(x, collapse=','), ']', sep='') 
+                if (any(duplicated(nms))) x <- paste('[', paste(x, collapse=','), ']', sep='')
                 else x <- paste('dict([', paste(x, collapse=','), '])', sep='') } }
         else x <- paste('[', paste(x, collapse=','), ']', sep='')
         return(x) }
@@ -506,7 +506,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
                     if (file.exists(apath)) .libPaths(apath)} } } }
     if(identical(.Platform$OS.type, 'windows')) .addLibs()
     rm(.addLibs)
-    ''' 
+    '''
     _DEBUG_MODE = True
 
     def __init__(self, RCMD='R', max_len=1000, use_numpy=True, use_pandas=True, use_dict=None,
@@ -672,7 +672,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
             use_dict = self.use_dict
         cmd = '.getRvalue4Python__(%s, use_dict=%s, has_numpy=%s, has_pandas=%s)' % (obj, use_dict is None and 'NULL' or use_dict and 'TRUE' or 'FALSE', self.has_numpy and 'TRUE' or 'FALSE', self.has_pandas and 'TRUE' or 'FALSE')
         rlt = self.__call__(cmd, use_try=use_try)
-        head = (use_try and 'try({%s})%s[1] ' or '%s%s[1] ') % (cmd, self.newline) 
+        head = (use_try and 'try({%s})%s[1] ' or '%s%s[1] ') % (cmd, self.newline)
         # sometimes (e.g. after "library(fastICA)") the R on Windows uses '\n' instead of '\r\n'
         head = rlt.startswith(head) and len(head) or len(head) - 1
         tail = rlt.endswith(self.newline) and len(rlt) - len(self.newline) or len(rlt) - len(self.newline) + 1 # - len('"')
@@ -761,7 +761,7 @@ class R(object): # "del r.XXX" fails on FePy-r7 (IronPython 1.1 on .NET 2.0.5072
 
 
 # for a single-round duty:
-def runR(CMDS, Robj='R', max_len=1000, use_numpy=True, use_pandas=True, use_dict=None, host='localhost', user=None, ssh='ssh'):
+def runR(CMDS, Robj='R', max_len=1000, use_numpy=True, use_pandas=True, use_dict=None, host='localhost', user=None, ssh='ssh', dump_stdout = False):
     '''
     Run a (list of) R command(s), and return the output from the STDOUT.
 
@@ -795,5 +795,3 @@ def runR(CMDS, Robj='R', max_len=1000, use_numpy=True, use_pandas=True, use_dict
     if len(rlt) == 1:
         rlt = rlt[0]
     return(rlt)
-    
-
