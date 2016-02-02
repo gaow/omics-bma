@@ -30,11 +30,18 @@ rule deepdish:
   output: "../external/deepdish/deepdish.log"
   shell: "cd ../external/deepdish; python setup.py install > deepdish.log; cd -"
 
+rule utils:
+  output: "pyper.py", "utils.py"
+  run:
+    for item in output:
+        shell('wget https://raw.githubusercontent.com/gaow/utils/master/{}'.format(item))
+
 rule install:
   input:
     rules.gsl.output,
     rules.swig.output,
-    rules.deepdish.output
+    rules.deepdish.output,
+    rules.utils.output
   output:
     touch("build.done")
   shell: "python setup.py install"

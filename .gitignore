@@ -6,3 +6,5 @@ doc/wiki
 src/external/*
 !src/external/Snakefile
 !src/external/README.md
+src/internal/pyper.py
+src/internal/utils.py
