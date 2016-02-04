@@ -5,30 +5,23 @@ import os
 import numpy as np
 import pandas as pd
 import deepdish as dd
-from .utils_io import ConfigReader, map2pandas, load_ddm
+from .utils_io import ConfigReader, dict2map, map2pandas, load_ddm
 from .utils import is_empty, env
 from .pyeqtlbma import BFCalculator
 from .mix_opt import mixIP
 from .utils_workhorse import PosteriorController
 
-
 def test_association(params):
-    params = ConfigReader(params)
-    try:
-        fn = params["vectors"]["sumstats"]
-        sumstats = load_ddm(fn[0], fn[1])
+    params = dict2map(ConfigReader(params))
+    if "input_sumstats_data" not in params['None']:
+        sumstats = load_ddm(params["vectors"]["input_sumstats_data"], '/')
         env.log("Use existing summary statistics data from [{}]".\
-                format(os.path.join(os.path.splitext(fn[0])[0], fn[1])))
-    except:
+                format(os.path.splitext(params["vectors"]["input_sumstats_data"])[0]))
+    else:
         sumstats = {'':{'':{'':{'':0}}}}
     exe = BFCalculator(params["string"], params["int"], params["float"], params["vectors"])
-    exe.apply(sumstats, dd.io.load(params["string"]["priors"]))
-    res = {"SumStats":
-           map2pandas(exe.GetSstats(), "ddm",
-                      rownames = exe.GetSstatsRownames(),
-                      colnames = ("maf", "n", "pve", "sigmahat", "betahat.geno",
-                                  "sebetahat.geno", "betapval.geno")),
-           "Abfs":
+    exe.apply(sumstats, dd.io.load(params["string"]["prior_data"]))
+    res = {"log10BFs":
            map2pandas(exe.GetAbfs(), "dm",
                       rownames = exe.GetAbfsNames()),
            "SepPermPvals":
@@ -41,13 +34,20 @@ def test_association(params):
            map2pandas(exe.GetJoinSstats(), "ddm",
                       rownames = exe.GetJoinSstatsRownames())
            }
-    dd.io.save(params["string"]["output"],
+    dd.io.save(params["string"]["association_data"],
                dict((k, v) for k, v in res.items() if not is_empty(v)),
                compression=("zlib", 9))
+    res = map2pandas(exe.GetSstats(), "ddm",
+                     rownames = exe.GetSstatsRownames(),
+                      colnames = ("maf", "n", "pve", "sigmahat", "betahat.geno",
+                                  "sebetahat.geno", "betapval.geno")
+                                  )
+    dd.io.save(params["string"]["output_sumstats_data"], res, compression = ("zlib", 9))
+
 
 def fit_hm(params):
     params = ConfigReader(params)
-    data = pd.concat(dd.io.load(params["output"], '/' + params["table_abf"])).\
+    data = pd.concat(dd.io.load(params["association_data"], 'log10BFs')).\
       rename(columns = {'nb_groups' : 'null'})
     data['null'] = 0
     if params['extract_average_bf_per_class']:
@@ -57,14 +57,14 @@ def fit_hm(params):
     res, converged = mixIP(np.power(10, data), control = params["optimizer_control"])
     if not converged:
         env.error("Convex optimization for hierarchical Model did not converge!")
-    # FIXME: eventually all output should be in the same file after I update deepdish with append mode
-    dd.io.save(params["output_2"], {params["table_pi"]: pd.Series(res, index = data.columns)},
-               compression=("zlib", 9))
+    dd.io.save(params["association_data"], {'pi': pd.Series(res, index = data.columns)},
+               compression=("zlib", 9), mode = 'a')
 
 def calculate_posterior(params):
     params = ConfigReader(params)
-    # FIXME: all these names
-    pc = PosteriorController((params["output"], "/JoinSstats"), (params["output"], "/Abfs"),
-                             (params["priors"], "/"), (params["output_2"], "/" + params["table_pi"]),
-                             (params["output_3"], "/"), params)
+    pc = PosteriorController((params["association_data"], "/JoinSstats"),
+                             (params["association_data"], "/log10BFs"),
+                             (params["prior_data"], "/"),
+                             (params["association_data"], "/pi"),
+                             (params["posterior_data"], "/"), params)
     pc.ScanBlocks()

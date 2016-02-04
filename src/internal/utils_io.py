@@ -198,64 +198,33 @@ class ConfigReader(dict):
                      'analys': None,
                      'lik': 'normal',
                      'bfs': 'sin',
-                     'cis': 1000})
+                     'cis': 1000,
+                     'wrtsize': 10})
         self.update(flatten_dict(params))
         self.check_input()
         self.check_output()
         self.check_analysis()
         self.check_permutation()
         self.check_runtime()
-        self.check_others()
 
     def check_input(self):
-        params["sbgrp"] = str2list(params["sbgrp"])
-        if not is_null(params["sumstats"]):
-            params["sumstats"] = str2list(params["sumstats"])
-            if len(params["sumstats"]) != 2:
-                env.error("Parameter 'sumstats' should have 2 elements: filename, data_path", exit = True)
-            if not params["sumstats"][1].startswith("/"):
-                params["sumstats"][1] = "/" + params["sumstats"][1]
-        #
+        self["sbgrp"] = str2list(self["sbgrp"])
 
     def check_output(self):
-        pass
+        for item in ['output_sumstats_data', 'association_data', 'posterior_data']:
+            try:
+                self[item] = rename_stamp(re.match(r'stamp\((.*)\)', self[item]).group(1))
+            except AttributeError:
+                pass
 
     def check_analysis(self):
-        params["bfs"] = str2list(params["bfs"])
+        self["bfs"] = str2list(self["bfs"])
 
     def check_permutation(self):
         pass
 
     def check_runtime(self):
-        pass
-
-    def check_others(self):
-        pass
-
-        #
-        #
-        if "wrtsize" not in params:
-            params["wrtsize"] = 10
-        try:
-            params["output"] = rename_stamp(re.match(r'stamp\((.*)\)', params["output"]).group(1))
-        except AttributeError:
-            pass
-        return dict2map(params)
-
-    def check_fit_hm_input(self, params):
-        try:
-            params["output"] = rename_stamp(re.match(r'stamp\((.*)\)', params["output"]).group(1))
-        except AttributeError:
-            pass
-        if not 'optimizer_control' in params:
-            params['optimizer_control'] = {}
-        if "thread" in params:
-            params['optimizer_control']['iparam.num_threads'] = params['thread']
-        return params
-
-    def check_posterior_inference_input(self, params):
-        try:
-            params["output"] = rename_stamp(re.match(r'stamp\((.*)\)', params["output"]).group(1))
-        except AttributeError:
-            pass
-        return params
+        if not 'optimizer_control' in self:
+            self['optimizer_control'] = {}
+        if "thread" in self:
+            self['optimizer_control']['iparam.num_threads'] = self['thread']

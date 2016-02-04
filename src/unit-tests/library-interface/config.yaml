@@ -12,9 +12,8 @@ input:
 
 output:
     extract_average_bf_per_class: 0
-    output_sumstats_data:
+    output_sumstats_data: stamp(output/sumstats.h5)
     association_data: stamp(output/test_association.h5)
-    mixture_weights_data: weights.h5
     posterior_data: stamp(output/calc_posterior.h5)
 
 permutation:
@@ -32,7 +31,7 @@ runtime:
 
 analysis:
     anchor: TSS
-    cis: 1000
+    cis: 5
     lik: normal
     qnorm: 1
     maf: 0.01
