@@ -30,6 +30,6 @@ def load_eqtlbma_bf(filename):
     return res
 
 def load_omicsbma_bf(filename):
-    res = dd.io.load(filename, "/Abfs")
+    res = dd.io.load(filename, "/log10BFs")
     # print(res)
     return res

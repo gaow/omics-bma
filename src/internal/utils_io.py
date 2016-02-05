@@ -212,6 +212,9 @@ class ConfigReader(dict):
 
     def check_output(self):
         for item in ['output_sumstats_data', 'association_data', 'posterior_data']:
+            if self[item] is None:
+                env.error('Parameter "{}" not found! Please specify it in parameter input file'.\
+                          format(item), exit = True)
             try:
                 self[item] = rename_stamp(re.match(r'stamp\((.*)\)', self[item]).group(1))
             except AttributeError:

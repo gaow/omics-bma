@@ -7,7 +7,7 @@ configfile: "config.yaml"
 
 rule test_association:
   threads:
-    config['thread']
+    config['runtime']['thread']
   output:
     touch("test_association.done")
   run:
@@ -15,25 +15,28 @@ rule test_association:
 
 rule eqtlbma_bf:
   threads:
-    config['thread']
+    config['runtime']['thread']
   output:
     touch("eqtlbma_bf.done")
   shell:
     '''
-    eqtlbma_bf --geno {config[geno]} --scoord {config[scoord]} --exp {config[exp]} \
-    --gcoord {config[gcoord]} --covar {config[covar]} --anchor {config[anchor]} \
-    --cis {config[cis]} --lik {config[lik]} --analys {config[analys]} --qnorm {config[qnorm]} \
-    --maf {config[maf]} --gridL {config[gridL]} --gridS {config[gridS]} --bfs sin --error {config[error]} \
-    --fiterr {config[fiterr]} --nperm {config[nperm]} --seed {config[seed]} --trick {config[trick]} \
-    --tricut {config[tricut]} --permsep {config[permsep]} --pbf gen-sin --maxbf {config[maxbf]} \
-    --thread {config[thread]} --sbgrp s1+s2+s3 --out output/test_association
+    eqtlbma_bf --geno {config[input][geno]} --scoord {config[input][scoord]} --exp {config[input][exp]} \
+    --gcoord {config[input][gcoord]} --covar {config[input][covar]} --anchor {config[analysis][anchor]} \
+    --cis {config[analysis][cis]} --lik {config[analysis][lik]} --analys {config[analysis][analys]} \
+    --qnorm {config[analysis][qnorm]} --maf {config[analysis][maf]} --gridL {config[input][gridL]} \
+    --gridS {config[input][gridS]} --bfs sin --error {config[analysis][error]} \
+    --fiterr {config[analysis][fiterr]} --nperm {config[permutation][nperm]} \
+    --seed {config[runtime][seed]} --trick {config[permutation][trick]} \
+    --tricut {config[permutation][tricut]} --permsep {config[permutation][permsep]} \
+    --pbf gen-sin --maxbf {config[permutation][maxbf]} \
+    --thread {config[runtime][thread]} --sbgrp s1+s2+s3 --out output/test_association
     '''
 
 rule compare_output:
   input:
     "test_association.done", "eqtlbma_bf.done"
   threads:
-    config['thread']
+    config['runtime']['thread']
   output:
     touch("comparison.done")
   run:
