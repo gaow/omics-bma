@@ -29,6 +29,7 @@ rule eqtlbma_bf:
     --seed {config[runtime][seed]} --trick {config[permutation][trick]} \
     --tricut {config[permutation][tricut]} --permsep {config[permutation][permsep]} \
     --pbf gen-sin --maxbf {config[permutation][maxbf]} \
+    --verbose {config[runtime][verbose]} \
     --thread {config[runtime][thread]} --sbgrp s1+s2+s3 --out output/test_association
     '''
 

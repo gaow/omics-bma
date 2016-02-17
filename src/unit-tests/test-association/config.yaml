@@ -29,7 +29,7 @@ permutation:
 runtime:
     seed: 10086
     thread: 8
-    verbose: 1
+    verbose: 0
 
 analysis:
     anchor: TSS

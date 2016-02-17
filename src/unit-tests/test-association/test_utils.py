@@ -2,6 +2,7 @@ from OmicsBMA.utils import openFile, get_value_type
 from pandas import DataFrame
 import deepdish as dd
 import os
+import pandas as pd
 
 COLNAMES = ['gen.' + str(i + 1) for i in range(25)] + \
   ['gen-fix.' + str(i + 1) for i in range(25)] + \
@@ -31,5 +32,6 @@ def load_eqtlbma_bf(filename):
 
 def load_omicsbma_bf(filename):
     res = dd.io.load(filename, "/log10BFs")
-    # print(res)
+    # with pd.option_context('display.max_rows', 999, 'display.max_columns', 999):
+    #     print(res)
     return res

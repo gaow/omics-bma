@@ -484,14 +484,12 @@ void pyeqtlbma::extractResAbfs(
 						exit(EXIT_FAILURE);
 					}
 					while (true) {
-						if (!colnames_saved) {
-							ssConfig.str("");
-							ssConfig << gsl_combination_get(comb, 0) + 1;
-							if (comb->k > 1)
-								for (size_t i = 1; i < k; ++i)
-									ssConfig << "-" <<
-									    gsl_combination_get(comb, i) + 1;
-						}
+						ssConfig.str("");
+						ssConfig << gsl_combination_get(comb, 0) + 1;
+						if (comb->k > 1)
+							for (size_t i = 1; i < k; ++i)
+								ssConfig << "-" <<
+								    gsl_combination_get(comb, i) + 1;
 						// write individual BFs
 						for (size_t j = 0; j < iGridS.size(); ++j) {
 							if (!colnames_saved) {
