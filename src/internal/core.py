@@ -47,13 +47,14 @@ def test_association(params):
 
 def fit_hm(params):
     params = ConfigReader(params)
-    data = pd.concat(dd.io.load(params["association_data"], 'log10BFs')).\
+    data = pd.concat(dd.io.load(params["association_data"], '/log10BFs')).\
       rename(columns = {'nb_groups' : 'null'})
+    # FIXME: need to implement penalized null
     data['null'] = 0
     if params['extract_average_bf_per_class']:
         data = data[[x for x in data.columns if not x.endswith('.avg')]]
-    # FIXME: need to implement penalized null
-    # FIXME: need to use BF at original scale
+    # down-scale data
+    data = data - np.max(data)
     res, converged = mixIP(np.power(10, data), control = params["optimizer_control"])
     if not converged:
         env.error("Convex optimization for hierarchical Model did not converge!")
