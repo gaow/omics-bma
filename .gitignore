@@ -1,10 +1,6 @@
-.snakemake
-*.tmp
-*.orig
-doc/wiki
-**/run.sh
-src/external/*
-!src/external/Snakefile
-!src/external/README.md
-src/internal/pyper.py
-src/internal/utils.py
+external
+build
+dist
+*.egg-info
+src/pyeqtlbma/__init__.py
+src/pyeqtlbma/pyeqtlbma_wrap.cxx

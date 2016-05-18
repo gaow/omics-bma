@@ -1,3 +1,0 @@
-md: tigernotes markdown
-wk: tigernotes dokuwiki --showall
-pdf: tigernotes doc --footnote --font_size 12 -a "Gao Wang" -t "OmicsBMA Documentation [version alpha]"
