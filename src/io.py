@@ -2,19 +2,18 @@
 # utils_io.py
 # Gao Wang (c) 2015
 import numpy as np
-import deepdish as dd
+import tables as tb
 import pandas as pd
 import re
-from .utils import env, flatten_dict, is_null
-import tables as tb
+from .utils import env, flatten_dict
 from .pyeqtlbma import get_eqtlbma_configurations, dict_x2_vectors
-
+from .deepdishio import load
 
 def map2pandas(data, to_obj, rownames = None, colnames = None):
     return Map2DataFrame(to_obj).convert(data, rownames, colnames)
 
 def load_ddm(filename, data_path):
-    res = dd.io.load(filename, data_path)
+    res = load(filename, data_path)
     for k1, v1 in list(res.items()):
         for k2, v2 in list(v1.items()):
             res[k1][k2] = v2.transpose().to_dict()
@@ -44,7 +43,8 @@ class Map2DataFrame(object):
             res[k1] = {}
             for k2, val2 in list(dict(val1).items()):
                 res[k1][k2] = pd.DataFrame(np.matrix(val2),
-                                           index = rownames[k1][k2] if type(rownames) is dict_x2_vectors else rownames,
+                                           index = rownames[k1][k2]
+                                           if type(rownames) is dict_x2_vectors else rownames,
                                            columns = colnames)
         return res
 
@@ -126,7 +126,7 @@ def load_priors(prior_path, dim, config):
     A dictionary of prior matrices with keys matching ID's for Bayes Factors and weights
     '''
     assert config in ['gen', 'sin', 'all']
-    data = dd.io.load(prior_path[0], prior_path[1])
+    data = load(prior_path[0], prior_path[1])
     res = {}
     # FIXME: check prior input data make sure they are good
     # Add null model

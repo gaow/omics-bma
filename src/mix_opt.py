@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
-# mix_opt.py
-# Gao Wang (c) 2015
+__author__ = "Gao Wang"
+__copyright__ = "Copyright 2016, Stephens lab"
+__email__ = "gaow@uchicago.edu"
+__license__ = "MIT"
+__version__ = "0.1.0"
+import sys
 import numpy as np
 import mosek as mk
 from mosek import iparam, dparam, sparam

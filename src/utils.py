@@ -1,7 +1,13 @@
 #! /usr/bin/env python3
-# utils.py
-# Gao Wang (c) 2015
-import sys, os, subprocess, shutil, glob, shlex, re, hashlib, tempfile, datetime, gzip, time
+__author__ = "Gao Wang"
+__copyright__ = "Copyright 2016, Stephens lab"
+__email__ = "gaow@uchicago.edu"
+__license__ = "MIT"
+__version__ = "0.1.0"
+import sys, os, subprocess, shutil, glob, shlex, re, \
+    hashlib, datetime, gzip, time, bz2, array, \
+    tarfile, platform
+from distutils.dir_util import mkpath
 from io import StringIO
 from contextlib import contextmanager
 import itertools
@@ -196,15 +202,6 @@ def openFile(filename):
         # binary here in order to process them equally in order for things to work
         # correctly under python 3
         return open(filename, 'rb')
-
-def getTermWidth():
-    if env.term_width is not None:
-        return env.term_width
-    try:
-        h, w = array('h', ioctl(sys.stderr, termios.TIOCGWINSZ, '\0' * 8))[:2]
-        return w
-    except:
-        return 78
 
 def calculateMD5(filename, partial=False):
     filesize = os.path.getsize(filename)
