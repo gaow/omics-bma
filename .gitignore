@@ -4,3 +4,4 @@ dist
 *.egg-info
 src/pyeqtlbma/__init__.py
 src/pyeqtlbma/pyeqtlbma_wrap.cxx
+**/.sos

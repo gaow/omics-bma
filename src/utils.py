@@ -317,7 +317,6 @@ def decompressGzFile(filename, inplace=True, force=False, md5=None):
     else:
         return filename
 
-
 def rename_tmp(filename):
     '''Temporary output of filename'''
     # turn path/filename.ext to path/filename_tmp???.ext, where ??? is

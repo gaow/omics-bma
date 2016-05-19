@@ -5,7 +5,7 @@ import numpy as np
 import deepdish as dd
 import pandas as pd
 import re
-from .utils import env, rename_stamp, flatten_dict, is_null
+from .utils import env, flatten_dict, is_null
 import tables as tb
 from .pyeqtlbma import get_eqtlbma_configurations, dict_x2_vectors
 
@@ -215,10 +215,6 @@ class ConfigReader(dict):
             if self[item] is None:
                 env.error('Parameter "{}" not found! Please specify it in parameter input file'.\
                           format(item), exit = True)
-            try:
-                self[item] = rename_stamp(re.match(r'stamp\((.*)\)', self[item]).group(1))
-            except AttributeError:
-                pass
 
     def check_analysis(self):
         self["bfs"] = str2list(self["bfs"])

@@ -56,5 +56,6 @@ setup(name        = PACKAGE,
       version     = "0.1.0",
       packages    = [PACKAGE, "{}.pyeqtlbma".format(PACKAGE)],
       package_dir = {PACKAGE: "src", "{}.pyeqtlbma".format(PACKAGE): "src/pyeqtlbma"},
-      ext_modules = [EQTLBMA_MODULE]
+      ext_modules = [EQTLBMA_MODULE],
+      install_requires = ['sos>=0.6.3', 'pyyaml', 'seaborn', 'pandas>=0.18.0', 'tables']
       )

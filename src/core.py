@@ -10,8 +10,11 @@ from .utils import is_empty, env
 from .pyeqtlbma import BFCalculator
 from .mix_opt import mixIP
 from .utils_workhorse import PosteriorController
+import yaml
 
 def test_association(params):
+    if os.path.isfile(params):
+        params = yaml.load(open(params))
     params = dict2map(ConfigReader(params))
     if "input_sumstats_data" not in params['None']:
         sumstats = load_ddm(params["vectors"]["input_sumstats_data"], '/')
@@ -46,6 +49,8 @@ def test_association(params):
 
 
 def fit_hm(params):
+    if os.path.isfile(params):
+        params = yaml.load(open(params))
     params = ConfigReader(params)
     data = pd.concat(dd.io.load(params["association_data"], '/log10BFs')).\
       rename(columns = {'nb_groups' : 'null'})
@@ -62,6 +67,8 @@ def fit_hm(params):
                compression=("zlib", 9), mode = 'a')
 
 def calculate_posterior(params):
+    if os.path.isfile(params):
+        params = yaml.load(open(params))
     params = ConfigReader(params)
     pc = PosteriorController((params["association_data"], "/JoinSstats"),
                              (params["association_data"], "/log10BFs"),

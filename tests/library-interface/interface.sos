@@ -1,0 +1,29 @@
+#!/usr/bin/env sos-runner
+#vim: set filetype=python: set expandtab : ts=4:
+#fileformat=SOS1.0
+from OmicsBMA.utils import rename_stamp as stamp
+
+[analysis_1]
+# Test for association
+input: 'config.yaml'
+# output: stamp(CONFIG.output['output_sumstats_data'])
+output: CONFIG.output['output_sumstats_data']
+python:
+from OmicsBMA.core import test_association
+test_association(${input!r})
+
+[analysis_2]
+# Fit hierarchical model
+input: 'config.yaml'
+# output: stamp(CONFIG.output['association_data'])
+output: CONFIG.output['association_data']
+python:
+from OmicsBMA.core import fit_hm
+fit_hm(${input!r})
+
+[analysis_3]
+# Calculate posterior
+input: 'config.yaml'
+python:
+from OmicsBMA.core import calculate_posterior
+calculate_posterior(${input!r})
