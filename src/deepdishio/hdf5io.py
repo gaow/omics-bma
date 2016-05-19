@@ -4,7 +4,8 @@ import numpy as np
 import tables
 import warnings
 from scipy import sparse
-from . import conf, six
+import six
+from . import conf
 try:
     import pandas as pd
     _pandas = True

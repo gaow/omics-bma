@@ -69,5 +69,5 @@ setup(name        = PACKAGE,
                      "{}.pyeqtlbma".format(PACKAGE): "src/pyeqtlbma",
                      "{}.deepdishio".format(PACKAGE): "src/deepdishio"},
       ext_modules = [EQTLBMA_MODULE],
-      install_requires = ['sos>=0.6.3', 'pyyaml', 'seaborn', 'pandas>=0.18.0', 'tables']
+      install_requires = ['sos>=0.6.3', 'pyyaml', 'seaborn', 'pandas>=0.18.0', 'six', 'tables']
       )
