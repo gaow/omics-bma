@@ -30,7 +30,7 @@ def test_association(prior_data, sumstats_data, output_file, params,
     else:
         sumstats = {'':{'':{'':{'':0}}}}
         params.CheckInputData()
-    env.logger.debug(params.Dump())
+    env.logger.debug("\n" + params.Dump())
     params = dict2map(params)
     calculator = BFCalculator(params["string"], params["int"], params["float"], params["vectors"])
     calculator.apply(sumstats, load(prior_data))
