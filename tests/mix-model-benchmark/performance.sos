@@ -6,7 +6,7 @@
 dataset = 'data/head' # light toy
 # dataset = 'data/test_association_l10abfs' # toy
 threads = 8
-lib_path = './'
+lib_path = '../'
 dim = 54
 
 [default_1: alias = "data"]

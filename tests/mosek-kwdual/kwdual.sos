@@ -1,7 +1,6 @@
 #!/usr/bin/env sos-runner
 #vim: set filetype=python: set expandtab : ts=4:
 #fileformat=SOS1.0
-import sys
 from OmicsBMA.core import test_almost_equal_recursive
 import numpy as np
 
@@ -17,12 +16,12 @@ output: "data.txt", "prior.txt", "init.txt"
 R:
 # set.seed(100)
 options(digits = 13)
-sampsize = 10000
-sd = c(1, 1.1, 1.2)
-z = rnorm(sampsize, 0, sample(sd, sampsize, replace = TRUE))
-lik = t(vapply(z, dnorm, sd, sd = sd))
-prior = c(1, 1, 1)
-pi.init = c(0.3, 0.2, 0.5)
+sampsize <- 10000
+sd <- c(1, 1.1, 1.2)
+z <- rnorm(sampsize, 0, sample(sd, sampsize, replace = TRUE))
+lik <- t(vapply(z, dnorm, sd, sd = sd))
+prior <- c(1, 1, 1)
+pi.init <- c(0.3, 0.2, 0.5)
 write.table(lik, ${output[0]!r}, row.names = F, col.names = F)
 write(prior, ${output[1]!r})
 write(pi.init, ${output[2]!r})

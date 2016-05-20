@@ -1,0 +1,49 @@
+#!/usr/bin/env sos-runner
+#vim: set filetype=python: set expandtab : ts=4:
+#fileformat=SOS1.0
+from OmicsBMA.utils import rename_stamp as stamp
+
+[parameters]
+lib_path = '../'
+niter = 10
+default_level = 5
+input_data = ['data/list_genotypes.txt', 'data/list_phenotypes.txt',
+           'data/list_covariates.txt', 'data/snp_coords.bed.gz', 'data/gene_coords.bed.gz']
+
+[default_1: alias = "eqtlbma_bf"]
+input: input_data
+output: 'output/test_association_l10abfs_raw.txt.gz'
+run:
+    eqtlbma_bf --geno ${input[0]} --scoord ${input[3]} --exp ${input[1]} \
+    --gcoord ${input[5]} --covar ${input[2]} --anchor ${CONFIG.analysis["anchor"]} \
+    --cis ${CONFIG.analysis["cis"]} --lik ${CONFIG.analysis["lik"]} --analys ${CONFIG.analysis["analys"]} \
+    --qnorm ${CONFIG.analysis["qnorm"]} --maf ${CONFIG.analysis["maf"]} --gridL ${CONFIG.input["gridL"]} \
+    --gridS ${CONFIG.input["gridS"]} --bfs sin --error ${CONFIG.analysis["error"]} \
+    --fiterr ${CONFIG.analysis["fiterr"]} --nperm ${CONFIG.permutation["nperm"]} \
+    --seed ${CONFIG.runtime["seed"]} --trick ${CONFIG.permutation["trick"]} \
+    --tricut ${CONFIG.permutation["tricut"]} --permsep ${CONFIG.permutation["permsep"]} \
+    --pbf gen-sin --maxbf ${CONFIG.permutation["maxbf"]} \
+    --verbose ${CONFIG.runtime["verbose"]} \
+    --thread ${CONFIG.runtime["thread"]} --sbgrp s1+s2+s3 --out output/test_association >& ${output}
+
+[default_2]
+# input: stamp('output/test_association.h5'), 'output/test_association_l10abfs_raw.txt.gz'
+input: stamp('output/test_association.h5'), eqtlbma_bf.output
+python:
+import sys, os
+sys.path.append(${lib_path!ra})
+from test_utils import load_omicsbma_bf, load_eqtlbma_bf
+import numpy as np
+data1 = load_omicsbma_bf(${input[0]!r}, "/log10BFs")
+data2 = load_eqtlbma_bf(${input[1]!r})
+genes = list(data2.keys())
+for g in genes:
+    snps = list(data2[g].index)
+    cols = list(data2[g])
+    for s in snps:
+        for x, y, z in zip(data1[g].loc[s, cols], data2[g].loc[s, cols], cols):
+            print(g, s, z)
+            try:
+                np.testing.assert_almost_equal(x, y, ${default_level})
+            except:
+                raise

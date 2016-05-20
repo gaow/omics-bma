@@ -1,17 +1,18 @@
 from OmicsBMA.utils import openFile, get_value_type
 from pandas import DataFrame
-import deepdish as dd
+import tables as tb
+import warnings
+warnings.simplefilter(action = "ignore", category = tb.NaturalNameWarning)
+from OmicsBMA.deepdishio import load
 import os
-import pandas as pd
 
 COLNAMES = ['gen.' + str(i + 1) for i in range(25)] + \
   ['gen-fix.' + str(i + 1) for i in range(25)] + \
-  ['gen-maxh.' + str(i + 1) for i in range(25)] + \
-  ['cfg.1.' + str(i + 1) for i in range(10)] + \
-  ['cfg.2.' + str(i + 1) for i in range(10)] + \
-  ['cfg.3.' + str(i + 1) for i in range(10)]
+  ['gen-maxh.' + str(i + 1) for i in range(25)]
 
-def load_eqtlbma_bf(filename):
+def load_eqtlbma_bf(filename, n_cfg = 3):
+    for j in range(n_cfg):
+        COLNAMES.extend(['cfg.{}.{}'.format(j + 1, i + 1) for i in range(10)])
     with openFile(filename) as f:
         # skip header
         f.readline()
@@ -30,8 +31,8 @@ def load_eqtlbma_bf(filename):
     # print(res)
     return res
 
-def load_omicsbma_bf(filename):
-    res = dd.io.load(filename, "/log10BFs")
+def load_omicsbma_bf(filename, table = "/"):
+    res = load(filename, table)
     # with pd.option_context('display.max_rows', 999, 'display.max_columns', 999):
     #     print(res)
     return res
