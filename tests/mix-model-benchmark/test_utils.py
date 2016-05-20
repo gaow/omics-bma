@@ -1,6 +1,9 @@
 from OmicsBMA.utils import openFile, get_value_type
 from pandas import DataFrame
-import deepdish as dd
+import tables as tb
+import warnings
+warnings.simplefilter(action = "ignore", category = tb.NaturalNameWarning)
+from OmicsBMA.deepdishio import load
 import os
 
 COLNAMES = ['gen.' + str(i + 1) for i in range(25)] + \
@@ -29,6 +32,6 @@ def load_eqtlbma_bf(filename):
     return res
 
 def load_omicsbma_bf(filename):
-    res = dd.io.load(filename, "/")
+    res = load(filename, "/")
     # print(res)
     return res

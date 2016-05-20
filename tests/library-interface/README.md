@@ -4,3 +4,11 @@ This example uses a very light-weight input data-set to run all analysis steps i
 ```
 ./interface.sos
 ```
+To run simulation of toy data,
+```
+./interface.sos simulation
+```
+To run eqtlbma analysis as a benchmark,
+```
+./interface.sos eqtlbma
+```
