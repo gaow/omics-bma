@@ -1,10 +1,6 @@
+## A complete toy analysis example
 
-## Unit Test for Interface
-
-
-This unit-test uses a very light-weight input data-set to run the program without any actual tests, just to ensure the implementation roughly works. This is essentially a play-ground in the development process. To run the test,
-
+This example uses a very light-weight input data-set to run all analysis steps involved. This is not a unit-test (it does not check for correctness of the runs), rather it is a play-ground to evaluate the interface. To run the test,
 ```
-snakemake all
+./interface.sos
 ```
-
