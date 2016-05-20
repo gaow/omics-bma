@@ -1,6 +1,9 @@
 #! /usr/bin/env python3
-# utils_workhorse.py
-# Gao Wang (c) 2015
+__author__ = "Gao Wang"
+__copyright__ = "Copyright 2016, Stephens lab"
+__email__ = "gaow@uchicago.edu"
+__license__ = "MIT"
+__version__ = "0.1.0"
 import numpy as np
 import os
 from .io import get_tb_groups, load_priors
