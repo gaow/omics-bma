@@ -5,7 +5,6 @@ from OmicsBMA.utils import rename_stamp as stamp
 
 [parameters]
 lib_path = '../'
-niter = 10
 default_level = 5
 input_data = ['data/list_genotypes.txt', 'data/list_phenotypes.txt',
            'data/list_covariates.txt', 'data/snp_coords.bed.gz', 'data/gene_coords.bed.gz']

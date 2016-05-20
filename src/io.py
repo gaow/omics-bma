@@ -46,6 +46,7 @@ class ArgumentLoader(dict):
             self['optimizer_control'].update(params['optimizer_control'])
             del params['optimizer_control']
         self.update(flatten_dict(params))
+        self['optimizer_control']['iparam.log'] = self['verbose']
         self.QC()
 
     def QC(self):
