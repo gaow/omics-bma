@@ -21,7 +21,7 @@ def test_association(params):
     params = dict2map(ConfigReader(params))
     if "input_sumstats_data" not in params['None']:
         sumstats = load_ddm(params["vectors"]["input_sumstats_data"], '/')
-        env.log("Use existing summary statistics data from [{}]".\
+        env.logger.info("Use existing summary statistics data from ``{}``".\
                 format(os.path.splitext(params["vectors"]["input_sumstats_data"])[0]))
     else:
         sumstats = {'':{'':{'':{'':0}}}}
@@ -50,7 +50,6 @@ def test_association(params):
                                   )
     save(params["string"]["output_sumstats_data"], res, compression = ("zlib", 9))
 
-
 def fit_hm(params):
     if os.path.isfile(params):
         params = yaml.load(open(params))
@@ -65,7 +64,7 @@ def fit_hm(params):
     data = data - np.max(data)
     res, converged = mixIP(np.power(10, data), control = params["optimizer_control"])
     if not converged:
-        env.error("Convex optimization for hierarchical Model did not converge!")
+        env.logger.error("Convex optimization for hierarchical Model did not converge!")
     save(params["association_data"], {'pi': pd.Series(res, index = data.columns)},
                compression=("zlib", 9), mode = 'a')
 

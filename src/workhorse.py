@@ -4,8 +4,8 @@
 import numpy as np
 import deepdish as dd
 import os
-from .utils_io import get_tb_groups, load_priors
-from .utils_math import SnpPosteriorCalculator, BlockPosteriorCalculator
+from .io import get_tb_groups, load_priors
+from .core import SnpPosteriorCalculator, BlockPosteriorCalculator
 
 class PosteriorController(object):
     def __init__(self, sumstats_path, bf_path, prior_path, weights_path, output_path, config):

@@ -33,7 +33,7 @@ class Map2DataFrame(object):
         elif data_type == "dv":
             self.convert = self.get_dict_vector_obj
         else:
-            env.error("Unknown data type {}".format(data_type), exit = True)
+            env.logger.error("Unknown data type ``{}``".format(data_type), exit = True)
 
     def get_dict_x2_matrix_obj(self, value, rownames, colnames):
         if colnames is None and "colnames" in rownames:
@@ -99,7 +99,7 @@ def dict2map(value):
 
 def get_tb_groups(filenames, group_name = None, verbose = True):
     if verbose:
-        env.log('Collecting group names from input files ...')
+        env.logger.info('Collecting group names from input files ...')
     names = set()
     for filename in filenames if type(filenames) is list else [filenames]:
         if verbose:
@@ -213,8 +213,8 @@ class ConfigReader(dict):
     def check_output(self):
         for item in ['output_sumstats_data', 'association_data', 'posterior_data']:
             if self[item] is None:
-                env.error('Parameter "{}" not found! Please specify it in parameter input file'.\
-                          format(item), exit = True)
+                raise ValueError('Parameter ``{}`` not found! Please specify it in parameter input file'.\
+                          format(item))
 
     def check_analysis(self):
         self["bfs"] = str2list(self["bfs"])

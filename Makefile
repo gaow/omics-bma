@@ -51,4 +51,4 @@ mosek:
 clean:
 	rm -rf build dist *.egg-info
 
-.PHONY: eqtlbma gsl mosek install_libs igsl ieqtlbma clean
+.PHONY: eqtlbma gsl mosek ieqtlbma igsl imosek download install_libs install clean
