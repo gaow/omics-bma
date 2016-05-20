@@ -9,72 +9,76 @@ import numpy as np
 import pandas as pd
 import yaml
 from .deepdishio import save, load
-from .io import ConfigReader, dict2map, map2pandas, load_ddm
-from .utils import is_empty, env
+from .io import ArgumentLoader, dict2map, map2pandas, load_ddm
+from .utils import env, is_empty
 from .pyeqtlbma import BFCalculator
 from .mix_opt import mixIP
 from .workhorse import PosteriorController
 
-def test_association(params):
-    if os.path.isfile(params):
+def test_association(prior_data, sumstats_data, output_file, params,
+                     genotype_list = None, phenotype_list = None, covariate_list = None,
+                     snp_list = None, block_list = None):
+    if isinstance(params, str):
         params = yaml.load(open(params))
-    params = dict2map(ConfigReader(params))
-    if "input_sumstats_data" not in params['None']:
-        sumstats = load_ddm(params["vectors"]["input_sumstats_data"], '/')
+    params = ArgumentLoader(params)
+    env.verbosity = params['verbose']
+    params.LoadInputData(genotype_list, phenotype_list, covariate_list, snp_list, block_list)
+    if os.path.isfile(sumstats_data):
+        sumstats = load_ddm(sumstats_data, '/')
         env.logger.info("Use existing summary statistics data from ``{}``".\
-                format(os.path.splitext(params["vectors"]["input_sumstats_data"])[0]))
+                format(os.path.splitext(sumstats_data)[0]))
     else:
         sumstats = {'':{'':{'':{'':0}}}}
-    exe = BFCalculator(params["string"], params["int"], params["float"], params["vectors"])
-    exe.apply(sumstats, load(params["string"]["prior_data"]))
+        params.CheckInputData()
+    env.logger.debug(params.Dump())
+    params = dict2map(params)
+    calculator = BFCalculator(params["string"], params["int"], params["float"], params["vectors"])
+    calculator.apply(sumstats, load(prior_data))
     res = {"log10BFs":
-           map2pandas(exe.GetAbfs(), "dm",
-                      rownames = exe.GetAbfsNames()),
+           map2pandas(calculator.GetAbfs(), "dm",
+                      rownames = calculator.GetAbfsNames()),
            "SepPermPvals":
-           map2pandas(exe.GetSepPermPvals(), "dm",
-                      rownames = exe.GetSepPermPvalsRownames()),
+           map2pandas(calculator.GetSepPermPvals(), "dm",
+                      rownames = calculator.GetSepPermPvalsRownames()),
            "JoinPermPvals":
-           map2pandas(exe.GetJoinPermPvals(), "m",
-                      rownames = exe.GetJoinPermPvalsRownames()),
+           map2pandas(calculator.GetJoinPermPvals(), "m",
+                      rownames = calculator.GetJoinPermPvalsRownames()),
            "JoinSstats":
-           map2pandas(exe.GetJoinSstats(), "ddm",
-                      rownames = exe.GetJoinSstatsRownames())
+           map2pandas(calculator.GetJoinSstats(), "ddm",
+                      rownames = calculator.GetJoinSstatsRownames())
            }
-    save(params["string"]["association_data"],
-               dict((k, v) for k, v in res.items() if not is_empty(v)),
-               compression=("zlib", 9))
-    res = map2pandas(exe.GetSstats(), "ddm",
-                     rownames = exe.GetSstatsRownames(),
-                      colnames = ("maf", "n", "pve", "sigmahat", "betahat.geno",
-                                  "sebetahat.geno", "betapval.geno")
-                                  )
-    save(params["string"]["output_sumstats_data"], res, compression = ("zlib", 9))
+    save(output_file, dict((k, v) for k, v in res.items() if not is_empty(v)), compression=("zlib", 9))
+    if not os.path.isfile(sumstats_data):
+        save(sumstats_data,
+             map2pandas(calculator.GetSstats(), "ddm",
+                        rownames = calculator.GetSstatsRownames(),
+                        colnames = ("maf", "n", "pve", "sigmahat", "betahat.geno",
+                                    "sebetahat.geno", "betapval.geno")),
+             compression = ("zlib", 9))
 
-def fit_hm(params):
-    if os.path.isfile(params):
+def fit_hm(association_data, output_file, params):
+    if isinstance(params, str):
         params = yaml.load(open(params))
-    params = ConfigReader(params)
-    data = pd.concat(load(params["association_data"], '/log10BFs')).\
-      rename(columns = {'nb_groups' : 'null'})
+    params = ArgumentLoader(params)
+    data = pd.concat(load(association_data, '/log10BFs')).rename(columns = {'nb_groups' : 'null'})
     # FIXME: need to implement penalized null
     data['null'] = 0
     if params['extract_average_bf_per_class']:
         data = data[[x for x in data.columns if not x.endswith('.avg')]]
-    # down-scale data
+    # scale data
     data = data - np.max(data)
     res, converged = mixIP(np.power(10, data), control = params["optimizer_control"])
     if not converged:
         env.logger.error("Convex optimization for hierarchical Model did not converge!")
-    save(params["association_data"], {'pi': pd.Series(res, index = data.columns)},
-               compression=("zlib", 9), mode = 'a')
+    save(output_file, {"pi": pd.Series(res, index = data.columns)}, compression=("zlib", 9))
 
-def calculate_posterior(params):
-    if os.path.isfile(params):
+def calculate_posterior(prior_data, mixture_data, association_data, output_file, params):
+    if isinstance(params, str):
         params = yaml.load(open(params))
-    params = ConfigReader(params)
-    pc = PosteriorController((params["association_data"], "/JoinSstats"),
-                             (params["association_data"], "/log10BFs"),
-                             (params["prior_data"], "/"),
-                             (params["association_data"], "/pi"),
-                             (params["posterior_data"], "/"), params)
+    params = ArgumentLoader(params)
+    pc = PosteriorController((association_data, "/JoinSstats"),
+                             (association_data, "/log10BFs"),
+                             (prior_data, "/"),
+                             (mixture_data, "/pi"),
+                             (output_file, "/"), params)
     pc.ScanBlocks()

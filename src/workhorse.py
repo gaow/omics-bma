@@ -2,10 +2,10 @@
 # utils_workhorse.py
 # Gao Wang (c) 2015
 import numpy as np
-import deepdish as dd
 import os
 from .io import get_tb_groups, load_priors
 from .core import SnpPosteriorCalculator, BlockPosteriorCalculator
+from .deepdishio import load, save
 
 class PosteriorController(object):
     def __init__(self, sumstats_path, bf_path, prior_path, weights_path, output_path, config):
@@ -14,7 +14,7 @@ class PosteriorController(object):
         feed into calculators and collect results'''
         # FIXME: check path, should not be too deep!
         priors = load_priors(prior_path, config['nb_groups'], config['bf_config'])
-        weights = dd.io.load(weights_path[0], weights_path[1]).to_dict()
+        weights = load(weights_path[0], weights_path[1]).to_dict()
         self.Uk_names, self.Uk_classes, self.Uk_partitions = self.__SortUkNames(list(weights.keys()))
         self.SnpCalculator = SnpPosteriorCalculator(np.array([priors[k] for k in self.Uk_names]),
                                                     np.array([weights[k] for k in self.Uk_names]),
@@ -39,7 +39,7 @@ class PosteriorController(object):
         res = {}
         for item in self.blocks:
             res[item] = self.__CalcBlock(item)
-        dd.io.save(self.output[0], res)
+        save(self.output[0], res)
 
     def __CalcBlock(self, block_name):
         '''
@@ -47,13 +47,12 @@ class PosteriorController(object):
         '''
         res = {}
         # bfs is a matrix with SNP ID as row names and Uk as columns, rearranged here column-wise
-        bfs = dd.io.load(self.bf[0], os.path.join(self.bf[1], block_name)).\
-          rename(columns = {'nb_groups' : 'null'})
+        bfs = load(self.bf[0], os.path.join(self.bf[1], block_name)).rename(columns = {'nb_groups' : 'null'})
         bfs = bfs[self.Uk_names]
         # FIXME: need BF input in original scale not log scale
         bfs['null'] = 0
         # sumstats is a dictionary with SNP ID as keys
-        sumstats = dd.io.load(self.sumstats[0], os.path.join(self.sumstats[1], block_name))
+        sumstats = load(self.sumstats[0], os.path.join(self.sumstats[1], block_name))
         for snp in list(bfs.index):
             # FIXME: need BF input in original scale not log scale
             bfs_snp = np.power(10, bfs.loc[snp]).as_matrix()

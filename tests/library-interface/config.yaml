@@ -1,44 +1,32 @@
 # Association testing
 input:
-    geno: data/list_genotypes.txt
-    scoord: data/snp_coords.bed.gz
-    exp: data/list_phenotypes.txt
-    gcoord: data/gene_coords.bed.gz
-    covar: data/list_covariates.txt
-    snp:
-    sbgrp: s1, s2, s3
-    input_sumstats_data:
-    prior_data: data/priors.h5
+  sbgrp: s1, s2, s3
 
 output:
-    extract_average_bf_per_class: 0
-    output_sumstats_data: output/sumstats.h5
-    association_data: output/test_association.h5
-    posterior_data: output/calc_posterior.h5
-
-permutation:
-    nperm: 100
-    trick: 0
-    tricut: 10
-    permsep: 0
-    pbf: all
-    maxbf: 0
+  posterior_data: output/calc_posterior.h5
 
 runtime:
-    seed: 10086
-    thread: 8
-    verbose: 1
+  seed: 10086
+  thread: 8
+  verbose: 1
+
+permutation:
+  nperm: 100
+  trick: 0
+  tricut: 10
+  permsep: 0
+  pbf: all
+  maxbf: 0
 
 analysis:
-    anchor: TSS
-    cis: 5
-    lik: normal
-    qnorm: 1
-    maf: 0.01
-    analys: join
-    bfs: sin, customized
-    error: hybrid
-    fiterr: 0.5
-
-nb_groups: 3
-bf_config: sin
+  anchor: TSS
+  cis: 5
+  lik: normal
+  qnorm: 1
+  maf: 0.01
+  analys: join
+  bfs: sin, customized
+  error: hybrid
+  fiterr: 0.5
+  nb_groups: 3
+  bf_config: sin

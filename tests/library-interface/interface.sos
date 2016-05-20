@@ -3,27 +3,31 @@
 #fileformat=SOS1.0
 from OmicsBMA.utils import rename_stamp as stamp
 
-[default_1]
+[default_1: alias = "test_association"]
 # Test for association
-input: 'config.yaml'
-# output: stamp(CONFIG.output['output_sumstats_data'])
-output: CONFIG.output['output_sumstats_data']
+input: 'data/priors.h5', 'config.yaml', 'data/list_genotypes.txt',
+       'data/list_phenotypes.txt', 'data/list_covariates.txt', 'data/snp_coords.bed.gz',
+       'data/gene_coords.bed.gz'
+output: stamp('output/sumstats.h5'), stamp('output/test_association.h5')
 python:
 from OmicsBMA import test_association
-test_association(${input!r})
+test_association(${input[0]!r}, ${output[0]!r}, ${output[1]!r}, ${input[1]!r},
+                 ${input[2]!r}, ${input[3]!r}, ${input[4]!r}, ${input[5]!r}, ${input[6]!r})
 
-[default_2]
+[default_2: alias = "fit_hm"]
 # Fit hierarchical model
-input: 'config.yaml'
-# output: stamp(CONFIG.output['association_data'])
-output: CONFIG.output['association_data']
+input: test_association.output[1], 'config.yaml'
+output: stamp('output/mixture.h5')
 python:
 from OmicsBMA import fit_hm
-fit_hm(${input!r})
+fit_hm(${input[0]!r}, ${output!r}, ${input[1]!r})
 
 [default_3]
 # Calculate posterior
-input: 'config.yaml'
+input: 'data/priors.h5', fit_hm.output, test_association.output[1], 'config.yaml'
+output: stamp('data/posterior.h5')
 python:
 from OmicsBMA import calculate_posterior
-calculate_posterior(${input!r})
+calculate_posterior(${input[0]!r}, ${input[1]!r}, ${input[2]!r}, ${output!r}, ${input[3]!r})
+run:
+  touch ${output}

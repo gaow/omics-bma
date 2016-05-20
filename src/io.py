@@ -1,23 +1,76 @@
 #! /usr/bin/env python3
 # utils_io.py
 # Gao Wang (c) 2015
+import os
 import numpy as np
 import tables as tb
 import pandas as pd
-import re
-from .utils import env, flatten_dict
+from .utils import env, flatten_dict, str2list, dict2str
 from .pyeqtlbma import get_eqtlbma_configurations, dict_x2_vectors
 from .deepdishio import load
 
-def map2pandas(data, to_obj, rownames = None, colnames = None):
-    return Map2DataFrame(to_obj).convert(data, rownames, colnames)
+class ArgumentLoader(dict):
+    def __init__(self, params):
+        self.__str__ = self.Dump
+        self.update({'extract_average_bf_per_class': 0,
+                     'permsep': 0,
+                     'trick': 0,
+                     'nperm': 100,
+                     'tricut': 10,
+                     'maxbf': 0,
+                     'pbf': 'all',
+                     'gcoord': None,
+                     'snp': None,
+                     'geno': None,
+                     'sbgrp': None,
+                     'covar': None,
+                     'exp': None,
+                     'scoord': None,
+                     'bf_config': 'sin',
+                     'nb_groups': None,
+                     'verbose': 2,
+                     'seed': 10086,
+                     'thread': 1,
+                     'fiterr': 0.5,
+                     'anchor': 'TSS',
+                     'error': None,
+                     'qnorm': 1,
+                     'maf': None,
+                     'analys': None,
+                     'lik': 'normal',
+                     'bfs': 'sin',
+                     'cis': 1000,
+                     'wrtsize': 10,
+                     'optimizer_control': {}})
+        if 'optimizer_control' in params:
+            self['optimizer_control'].update(params['optimizer_control'])
+            del params['optimizer_control']
+        self.update(flatten_dict(params))
+        self.QC()
 
-def load_ddm(filename, data_path):
-    res = load(filename, data_path)
-    for k1, v1 in list(res.items()):
-        for k2, v2 in list(v1.items()):
-            res[k1][k2] = v2.transpose().to_dict()
-    return res
+    def QC(self):
+        self["sbgrp"] = str2list(self["sbgrp"])
+        self["bfs"] = str2list(self["bfs"])
+        self['optimizer_control']['iparam.num_threads'] = self['thread']
+
+    def LoadInputData(self, genotype_list, phenotype_list, covariate_list, snp_list, block_list):
+        self['geno'] = genotype_list
+        self['scoord'] = snp_list
+        self['exp'] = phenotype_list
+        self['covar'] = covariate_list
+        self['gcoord'] = block_list
+
+    def CheckInputData(self):
+        names = {'gcoord': 'block_list', 'scoord': 'snp_list', 'exp': 'phenotype_list',
+                 'covar': 'covariate_list', 'geno': 'genotype_list'}
+        for name in names:
+            if self[name] is None:
+                raise ValueError('Please specify ``{}`` file name!'.format(names[name]))
+            if not os.path.isfile(self[name]):
+                raise OSError('Cannot find ``{}`` file ``{}``!'.format(names[name], self[name]))
+
+    def Dump(self):
+        return dict2str(self)
 
 class Map2DataFrame(object):
     '''
@@ -63,14 +116,23 @@ class Map2DataFrame(object):
     def get_matrix_obj(self, value, rownames, colnames):
         return pd.DataFrame(np.matrix(value), index = rownames, columns = colnames)
 
+def map2pandas(data, to_obj, rownames = None, colnames = None):
+    return Map2DataFrame(to_obj).convert(data, rownames, colnames)
+
+def load_ddm(filename, data_path):
+    res = load(filename, data_path)
+    for k1, v1 in list(res.items()):
+        for k2, v2 in list(v1.items()):
+            res[k1][k2] = v2.transpose().to_dict()
+    return res
+
 def dict2map(value):
     '''
     Convert data from Python heterogeneous dict to SWIG homogeneous map objects
     '''
-    params = {}
-    for item in ["string", "float", "int", "vectors", "vectorf", "vectori", "dict"]:
+    params = {"None":[]}
+    for item in ["string", "float", "int", "vectors", "vectorf", "vectori"]:
         params[item] = {}
-    params["None"] = []
     for k, val in list(value.items()):
         if type(val) == str:
             if val != "None":
@@ -88,9 +150,6 @@ def dict2map(value):
                 params['vectorf'][k] = val
             if type(val[0]) == str:
                 params['vectors'][k] = val
-        elif type(val) == dict:
-            # FIXME: should write some recursive function so that the yaml can have multiple layers
-            params["dict"][k] = val
         elif val is None:
             params["None"].append(k)
         else:
@@ -99,7 +158,7 @@ def dict2map(value):
 
 def get_tb_groups(filenames, group_name = None, verbose = True):
     if verbose:
-        env.logger.info('Collecting group names from input files ...')
+        env.logger.info('Collecting group names from ``{}`` ...'.format(repr(filenames)))
     names = set()
     for filename in filenames if type(filenames) is list else [filenames]:
         if verbose:
@@ -156,74 +215,3 @@ def load_priors(prior_path, dim, config):
             np.fill_diagonal(res["cfg.{}.{}".format(k, idx + 1)], np.sum(item))
             res["cfg.{}.{}".format(k, idx + 1)][np.where(np.outer(value, value) == 0)] = 0
     return res
-
-def str2list(value):
-    if value is None:
-        return []
-    else:
-        return [x.strip() for x in re.split(" |\+|,", value) if x.strip()]
-
-class ConfigReader(dict):
-    def __init__(self, params):
-        self.update({'association_data': None,
-                     'input_sumstats_data': None,
-                     'mixture_weights_data': None,
-                     'posterior_data': None,
-                     'extract_average_bf_per_class': 0,
-                     'permsep': 0,
-                     'trick': 0,
-                     'nperm': 100,
-                     'tricut': 10,
-                     'maxbf': 0,
-                     'pbf': 'all',
-                     'gcoord': None,
-                     'snp': None,
-                     'geno': None,
-                     'sbgrp': None,
-                     'covar': None,
-                     'output_sumstats_data': None,
-                     'exp': None,
-                     'prior_data': None,
-                     'scoord': None,
-                     'bf_config': 'sin',
-                     'nb_groups': None,
-                     'verbose': 1,
-                     'seed': 10086,
-                     'thread': 4,
-                     'fiterr': 0.5,
-                     'anchor': 'TSS',
-                     'error': None,
-                     'qnorm': 1,
-                     'maf': None,
-                     'analys': None,
-                     'lik': 'normal',
-                     'bfs': 'sin',
-                     'cis': 1000,
-                     'wrtsize': 10})
-        self.update(flatten_dict(params))
-        self.check_input()
-        self.check_output()
-        self.check_analysis()
-        self.check_permutation()
-        self.check_runtime()
-
-    def check_input(self):
-        self["sbgrp"] = str2list(self["sbgrp"])
-
-    def check_output(self):
-        for item in ['output_sumstats_data', 'association_data', 'posterior_data']:
-            if self[item] is None:
-                raise ValueError('Parameter ``{}`` not found! Please specify it in parameter input file'.\
-                          format(item))
-
-    def check_analysis(self):
-        self["bfs"] = str2list(self["bfs"])
-
-    def check_permutation(self):
-        pass
-
-    def check_runtime(self):
-        if not 'optimizer_control' in self:
-            self['optimizer_control'] = {}
-        if "thread" in self:
-            self['optimizer_control']['iparam.num_threads'] = self['thread']

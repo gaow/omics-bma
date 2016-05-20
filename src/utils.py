@@ -4,16 +4,22 @@ __copyright__ = "Copyright 2016, Stephens lab"
 __email__ = "gaow@uchicago.edu"
 __license__ = "MIT"
 __version__ = "0.1.0"
-import sys, os, subprocess, shlex, \
-    datetime, gzip, time, bz2
+import sys, os, subprocess, shlex, re, \
+    datetime, gzip, time, bz2, yaml, collections
 from io import StringIO
 from contextlib import contextmanager
-from collections import MutableMapping
 import pandas as pd
-from pysos.utils import logger
+from pysos.utils import RuntimeEnvironments
 
-class Environment:
+class Environment(RuntimeEnvironments):
+    _instance = None
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(Environment, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self):
+        super().__init__()
         self.term_width = None
         self.__width_cache = 1
         self.path = {'PATH':"{}:{}".format(os.getcwd(), os.environ["PATH"])}
@@ -21,7 +27,6 @@ class Environment:
         self.quiet = False
         self.colors = "#377EB8 #E41A1C #4DAF4A #984EA3 #FFD92F #FF7F00 #F781BF " \
                       "#8DD3C7 #B3B3B3 #000000 #56B4E9 #BC80BD #FDB462 #350E20 #8A9045 #800000".split()
-        self.logger = logger
 
     def error(self, msg = None, show_help = False, exit = False):
         if msg is None:
@@ -238,8 +243,37 @@ class Timer(object):
 def flatten_dict(d):
     items = []
     for k, v in d.items():
-        if isinstance(v, MutableMapping):
+        if isinstance(v, collections.MutableMapping):
             items.extend(flatten_dict(v).items())
         else:
             items.append((k, v))
     return dict(items)
+
+def str2list(value):
+    if value is None:
+        return []
+    else:
+        return [x.strip() for x in re.split(" |\+|,", value) if x.strip()]
+
+def strip_dict(data, mapping = dict, into_list = False):
+    if not isinstance(data, mapping):
+        return data
+    mapping_null = mapping()
+    new_data = mapping()
+    for k, v in data.items():
+        if isinstance(v, collections.Mapping):
+            v = strip_dict(v, mapping, into_list)
+        if isinstance(v, list) and into_list:
+            v = [strip_dict(x, mapping, into_list) for x in v]
+        if not is_null(v) and v != mapping_null:
+            new_data[k] = v
+    return new_data
+
+def dict2str(value, replace = []):
+    out = StringIO()
+    yaml.dump(strip_dict(value, into_list = True), out, default_flow_style=False)
+    res = out.getvalue()
+    out.close()
+    for item in replace:
+        res = res.replace(item[0], item[1])
+    return res
