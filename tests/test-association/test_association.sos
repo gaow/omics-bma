@@ -14,7 +14,7 @@ input: input_data
 output: 'output/test_association_l10abfs_raw.txt.gz'
 run:
     eqtlbma_bf --geno ${input[0]} --scoord ${input[3]} --exp ${input[1]} \
-    --gcoord ${input[5]} --covar ${input[2]} --anchor ${CONFIG.analysis["anchor"]} \
+    --gcoord ${input[4]} --covar ${input[2]} --anchor ${CONFIG.analysis["anchor"]} \
     --cis ${CONFIG.analysis["cis"]} --lik ${CONFIG.analysis["lik"]} --analys ${CONFIG.analysis["analys"]} \
     --qnorm ${CONFIG.analysis["qnorm"]} --maf ${CONFIG.analysis["maf"]} --gridL ${CONFIG.input["gridL"]} \
     --gridS ${CONFIG.input["gridS"]} --bfs sin --error ${CONFIG.analysis["error"]} \
@@ -23,10 +23,9 @@ run:
     --tricut ${CONFIG.permutation["tricut"]} --permsep ${CONFIG.permutation["permsep"]} \
     --pbf gen-sin --maxbf ${CONFIG.permutation["maxbf"]} \
     --verbose ${CONFIG.runtime["verbose"]} \
-    --thread ${CONFIG.runtime["thread"]} --sbgrp s1+s2+s3 --out output/test_association >& ${output}
+    --thread ${CONFIG.runtime["thread"]} --sbgrp s1+s2+s3 --out output/test_association >& /dev/null
 
 [default_2]
-# input: stamp('output/test_association.h5'), 'output/test_association_l10abfs_raw.txt.gz'
 input: stamp('output/test_association.h5'), eqtlbma_bf.output
 python:
 import sys, os
@@ -41,8 +40,8 @@ for g in genes:
     cols = list(data2[g])
     for s in snps:
         for x, y, z in zip(data1[g].loc[s, cols], data2[g].loc[s, cols], cols):
-            print(g, s, z)
             try:
                 np.testing.assert_almost_equal(x, y, ${default_level})
+                print(g, s, z, "ok")
             except:
                 raise
