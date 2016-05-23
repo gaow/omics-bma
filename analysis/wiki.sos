@@ -1,0 +1,38 @@
+#!/usr/bin/env sos-runner
+#vim: set filetype=python: set expandtab : ts=4:
+#fileformat=SOS1.0
+import glob, os
+
+[parameters]
+wiki = 'output/bma'
+project = 'bma'
+page = 'labnotes/concepts.notes'
+pages = ['labnotes/concepts.notes', 'labnotes/tutorials.notes', 'labnotes/applications-GTEx-mash.notes']
+asset = 'output'
+
+[markdown_1]
+run:
+ mkdir -p ${wiki}/figures
+
+[markdown_2]
+asset_dir = [os.path.abspath(x) for x in asset.split('+')]
+input: page, pattern = '{name}.notes', group_by = 'single'
+output: pattern = '{_name}.rmd'
+task: concurrent = True
+run:
+  labnotes markdown ${_input} -o ${_output} --suffix rmd --lite -s `date` `git rev-parse HEAD`\
+    --fig_path_adj "figures figures output" --asset_path ${asset_dir}
+
+[bookdown_1]
+input: [x[:-5] + 'rmd' for x in pages]
+output: '${wiki}/index.html'
+run:
+  labnotes bind --md ${input} -o '${wiki}' \
+		-a "Gao Wang" -t "OmicsBMA" --description "A machinery to interrogate genomics / transcriptomics data using Bayesian Model Averaging" --lite
+
+[bookdown_2]
+run:
+rsync -auzP ${wiki} ${CONFIG.business_webspace}
+rsync -auzP output/2016* ${CONFIG.business_webspace}/${project}/figures \
+  --include "*/" --include "*.pdf" --include "*.png" \
+  --include "*.jpg" --exclude "*" --delete

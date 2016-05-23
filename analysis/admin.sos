@@ -1,0 +1,14 @@
+#!/usr/bin/env sos-runner
+#vim: set filetype=python: set expandtab : ts=4:
+#fileformat=SOS1.0
+import glob, os
+[parameters]
+project = 'bma'
+
+[upload_assets]
+run:
+  rsync -auvP --prune-empty-dirs --chmod=g+w ${CONFIG.assets_dir}/* ${CONFIG.user}@${CONFIG.path}
+
+[download_assets]
+run:
+  rsync -auvP --prune-empty-dirs ${CONFIG.user}@${CONFIG.path}/* ${CONFIG.assets_dir}
