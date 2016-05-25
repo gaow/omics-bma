@@ -1,0 +1,69 @@
+#!/usr/bin/env sos-runner
+#fileformat=SOSNB1.0
+
+#cell markdown
+! This script evaluates results from IP method vs EM method and explore why the results agree / not agree
+
+#cell code 9
+%use python
+
+#cell code 10
+from OmicsBMA.deepdishio import save, load
+from OmicsBMA.io import ArgumentLoader
+import yaml
+import pandas as pd
+import numpy as np
+
+#cell code 11
+# Load data
+config_file = 'config.yaml'
+association_data = 'output/test_association_20160525_master.h5'
+params = ArgumentLoader(yaml.load(open(config_file)))
+data = pd.concat(load(association_data, '/log10BFs')).rename(columns = {'nb_groups' : 'null'})
+
+#cell code 12
+# Format data
+data['null'] = 0
+if params['extract_average_bf_per_class']:
+    data = data[[x for x in data.columns if not x.endswith('.avg')]]
+
+#cell code 13
+# Scale data
+data = data - np.max(data)
+
+#cell code 14
+data
+
+#cell code 15
+from OmicsBMA.mix_opt import mixIP
+res, converged = mixIP(np.power(10, data), control = params["optimizer_control"])
+
+#cell code 17
+res
+
+#cell code 19
+%with sos
+! Now do the same thing in R: save tmp data and use R to fit it
+
+#cell code 20
+from dsc.utils import save_rds
+save_rds(np.power(10, data), "data.rds")
+
+#cell code 22
+%use R
+dat = readRDS("data.rds")
+head(dat)
+
+#cell code 25
+library(ashr)
+res1 = mixEM(dat, rep(0, ncol(dat)))
+res2 = mixIP(dat, rep(0, ncol(dat)))
+
+#cell code 27
+res1
+
+#cell code 28
+res2
+
+#cell code
+
