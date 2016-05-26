@@ -43,7 +43,10 @@ res
 
 #cell code 9
 %with sos
-! Now do the same thing in R: save tmp data and use R to fit it
+! It does not look right, though. Because the null gets it all.
+! With eqtlbma_hm I get 70% for the null
+! The aim of this notebook is to check if I made an error in OmicsBMA codes
+! By doing the same thing in R using both EM and IP methods
 
 #cell code 10
 from dsc.utils import save_rds
@@ -56,11 +59,17 @@ head(dat)
 
 #cell code 12
 library(ashr)
-res1 = mixEM(dat, rep(0, ncol(dat)))
-res2 = mixIP(dat, rep(0, ncol(dat)))
+res1 = mixEM(dat, rep(1, ncol(dat)))
+res2 = mixIP(dat, rep(1, ncol(dat)))
 
 #cell code 13
 res1
 
 #cell code 14
 res2
+
+#cell code 15
+%with sos
+! It looks like the results between OmicsBMA and ASHR IP implementations are identical
+! And are in agreement with ASHR EM implementation. 
+! So there is nothing to worry about my code but I should worry about the equtions instead.
