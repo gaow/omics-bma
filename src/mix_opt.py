@@ -12,7 +12,7 @@ from scipy.sparse import csc_matrix as make_sparse
 import warnings
 warnings.simplefilter(action = "ignore", category = FutureWarning)
 
-def mixIP(matrix_lik, prior = None, control = {}):
+def mixIP(matrix_lik, prior = None, rtol = None, control = {}):
     n, k = matrix_lik.shape
     w = np.ones(n)
     if prior is not None:
@@ -23,7 +23,7 @@ def mixIP(matrix_lik, prior = None, control = {}):
         matrix_lik = matrix_lik[w != 0,:]
         w = w[w != 0]
     # Optimize
-    res = kw_dual(matrix_lik, np.ones(k), normalize(w), control = control)
+    res = kw_dual(matrix_lik, np.ones(k), normalize(w), rtol = rtol, control = control)
     return res
 
 def normalize(v):
