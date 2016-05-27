@@ -12,12 +12,12 @@ asset = 'output'
 
 [markdown_1]
 run:
- mkdir -p ${wiki}/figures
+ mkdir -p ${wiki}/figures ${wiki}/notebook
 
 [markdown_2]
 asset_dir = [os.path.abspath(x) for x in asset.split('+')]
 input: page, pattern = '{name}.notes', group_by = 'single'
-output: pattern = '{_name}.rmd'
+output: expand_pattern('{_name}.rmd')
 task: concurrent = True
 run:
   labnotes markdown ${_input} -o ${_output} --suffix rmd --lite -s `date` `git rev-parse HEAD`\
@@ -36,3 +36,4 @@ rsync -auzP ${wiki} ${CONFIG.business_webspace}
 rsync -auzP output/2016* ${CONFIG.business_webspace}/${project}/figures \
   --include "*/" --include "*.pdf" --include "*.png" \
   --include "*.jpg" --exclude "*" --delete
+rsync -auzP notebook/* ${CONFIG.business_webspace}/${project}/notebook
