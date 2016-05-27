@@ -1,74 +1,74 @@
 #!/usr/bin/env sos-runner
 #fileformat=SOSNB1.0
 
-#cell markdown
+#%% code 1
 ! This script evaluates results from IP method vs EM method and explore why the results agree / not agree
 
-#cell code 1
+#%% code 2
 %use python
 
-#cell code 2
+#%% code 3
 from OmicsBMA.deepdishio import save, load
 from OmicsBMA.io import ArgumentLoader
 import yaml
 import pandas as pd
 import numpy as np
 
-#cell code 3
+#%% code 4
 # Load data
 config_file = 'config.yaml'
 association_data = 'output/test_association_20160525_master.h5'
 params = ArgumentLoader(yaml.load(open(config_file)))
 data = pd.concat(load(association_data, '/log10BFs')).rename(columns = {'nb_groups' : 'null'})
 
-#cell code 4
+#%% code 5
 # Format data
 data['null'] = 0
 if params['extract_average_bf_per_class']:
     data = data[[x for x in data.columns if not x.endswith('.avg')]]
 
-#cell code 5
+#%% code 6
 # Scale data
 data = data - np.max(data)
 
-#cell code 6
+#%% code 7
 data
 
-#cell code 7
+#%% code 8
 from OmicsBMA.mix_opt import mixIP
 res, converged = mixIP(np.power(10, data), control = params["optimizer_control"])
 
-#cell code 8
+#%% code 9
 res
 
-#cell code 9
+#%% code 10
 %with sos
 ! It does not look right, though. Because the null gets it all.
 ! With eqtlbma_hm I get 70% for the null
 ! The aim of this notebook is to check if I made an error in OmicsBMA codes
 ! By doing the same thing in R using both EM and IP methods
 
-#cell code 10
+#%% code 11
 from dsc.utils import save_rds
 save_rds(np.power(10, data), "data.rds")
 
-#cell code 11
+#%% code 12
 %use R
 dat = unname(as.matrix(readRDS("data.rds")))
 head(dat)
 
-#cell code 12
+#%% code 13
 library(ashr)
 res1 = mixEM(dat, rep(1, ncol(dat)))
 res2 = mixIP(dat, rep(1, ncol(dat)))
 
-#cell code 13
+#%% code 14
 res1
 
-#cell code 14
+#%% code 15
 res2
 
-#cell code 15
+#%% code 16
 %with sos
 ! It looks like the results between OmicsBMA and ASHR IP implementations are identical
 ! And are in agreement with ASHR EM implementation. 
