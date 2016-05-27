@@ -36,7 +36,7 @@ data
 
 #%% code 8
 from OmicsBMA.mix_opt import mixIP
-res, converged = mixIP(np.power(10, data), control = params["optimizer_control"])
+res, converged = mixIP(np.power(10, data), prior = [10] + [1] * (data.shape[1] - 1), control = params["optimizer_control"])
 
 #%% code 9
 res
@@ -59,8 +59,8 @@ head(dat)
 
 #%% code 13
 library(ashr)
-res1 = mixEM(dat, rep(1, ncol(dat)))
-res2 = mixIP(dat, rep(1, ncol(dat)))
+res1 = mixEM(dat, c(10, rep(1, ncol(dat) - 1)))
+res2 = mixIP(dat, c(10, rep(1, ncol(dat) - 1)))
 
 #%% code 14
 res1

@@ -18,7 +18,7 @@ def mixIP(matrix_lik, prior = None, rtol = None, control = {}):
     if prior is not None:
         # Add in observations corresponding to prior
         matrix_lik = np.vstack((np.diag(np.ones(len(prior))), matrix_lik))
-        w = np.concatenate((prior - 1, w))
+        w = np.concatenate((np.array(prior) - 1, w))
         # Remove zero weight entries
         matrix_lik = matrix_lik[w != 0,:]
         w = w[w != 0]
