@@ -1,0 +1,12 @@
+#!/usr/bin/env sos-runner
+#vim: set filetype=python: set expandtab : ts=4:
+#fileformat=SOS1.0
+from OmicsBMA.utils import rename_stamp as stamp
+
+[default_1]
+# Fit hierarchical model via 2 different methods
+input: '../library-interface/interface.sos'
+sos_run('eqtlbma + omicsbma', source = ['/home/gaow/GIT/software/omics-bma/tests/library-interface/interface.sos'])
+
+[default_2]
+# Compare hierarchical model fitting
