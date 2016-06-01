@@ -66,7 +66,7 @@ def fit_hm(association_data, output_file, params):
     if params['extract_average_bf_per_class']:
         data = data[[x for x in data.columns if not x.endswith('.avg')]]
     # scale data
-    data = data - np.max(data)
+    data = data.subtract(data.max(axis = 1), axis = 0)
     res, converged = mixIP(np.power(10, data), control = params["optimizer_control"])
     if not converged:
         env.logger.error("Convex optimization for hierarchical Model did not converge!")

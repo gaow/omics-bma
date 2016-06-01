@@ -1,12 +1,52 @@
 #!/usr/bin/env sos-runner
 #vim: set filetype=python: set expandtab : ts=4:
 #fileformat=SOS1.0
-from OmicsBMA.utils import rename_stamp as stamp
+
+[parameters]
+threads = 8
+lib_path = '../'
 
 [default_1]
-# Fit hierarchical model via 2 different methods
-input: '../library-interface/interface.sos'
-sos_run('eqtlbma + omicsbma', source = ['/home/gaow/GIT/software/omics-bma/tests/library-interface/interface.sos'])
+# Fit hierarchical model via eqtlbma
+sos_run('eqtlbma', source = ['../library-interface/interface.sos'])
 
 [default_2]
-# Compare hierarchical model fitting
+# Fit hierarchical model via OmicsBMA
+input: 'output/out_eqtlbma_l10abfs_raw.txt.gz', 'config.yaml'
+output: 'output/out_eqtlbma_weights.h5'
+! Fit mixture model
+python:
+import sys, os
+sys.path.append(${lib_path!ra})
+from test_utils import load_eqtlbma_bf
+from OmicsBMA.deepdishio import save
+from OmicsBMA.mix_opt import mixIP 
+import numpy as np
+import pandas as pd
+data = pd.concat(load_eqtlbma_bf(${input[0]!r}, n_cfg = 7))
+data['null'] = 0
+# scale data
+data = data.subtract(data.max(axis = 1), axis = 0)
+res, converged = mixIP(np.power(10, data))
+if not converged:
+   sys.exit("Convex optimization for hierarchical Model did not converge!")
+save(${output!r}, {"pi": pd.Series(res, index = data.columns)}, compression=("zlib", 9))
+# from dsc.utils import save_rds
+# save_rds(np.power(10, data), "data.rds")
+
+! Result from mixIP
+run:
+  ddls -i /pi ${output}
+! Result from eqtlbma_hm
+run:
+  zcat output/out_eqtlbma_hm.txt.gz
+
+# [default_3]
+# Check mix EM algorithm
+# R:
+# dat = unname(as.matrix(readRDS("data.rds")))
+# library(ashr)
+# res1 = mixEM(dat, c(10, rep(1, ncol(dat) - 1)))
+# res2 = mixIP(dat, c(10, rep(1, ncol(dat) - 1)))
+# print(res1)
+# print(res2)
