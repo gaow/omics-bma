@@ -1,7 +1,7 @@
 #!/usr/bin/env sos-runner
 #vim: set filetype=python: set expandtab : ts=4:
 #fileformat=SOS1.0
-from OmicsBMA.core import test_almost_equal_recursive
+from OmicsBMA.utils import test_almost_equal_recursive
 import numpy as np
 
 [parameters]

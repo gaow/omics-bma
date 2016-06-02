@@ -277,3 +277,14 @@ def dict2str(value, replace = []):
     for item in replace:
         res = res.replace(item[0], item[1])
     return res
+
+def test_almost_equal_recursive(x, y, level = 6, level_cutoff = 3):
+    try:
+      np.testing.assert_almost_equal(x, y, level)
+    except AssertionError:
+      if level <= level_cutoff:
+          raise
+      else:
+          level = level - 1
+          test_almost_equal_recursive(x, y, level)
+    return level

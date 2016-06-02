@@ -13,7 +13,7 @@ from .io import ArgumentLoader, dict2map, map2pandas, load_ddm
 from .utils import env, is_empty
 from .pyeqtlbma import BFCalculator
 from .mix_opt import mixIP
-from .workhorse import PosteriorController
+from .posterior import PosteriorController
 
 def test_association(prior_data, sumstats_data, output_file, params,
                      genotype_list = None, phenotype_list = None, covariate_list = None,
