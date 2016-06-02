@@ -180,7 +180,7 @@ class PosteriorController(object):
         self.output = output_path
         self.blocks = get_tb_groups(sumstats_path[0], sumstats_path[1])
 
-    def ScanBlocks(self):
+    def __call__(self, nb_threads = 2):
         '''
         Input
         -----

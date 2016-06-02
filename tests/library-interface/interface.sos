@@ -51,12 +51,10 @@ fit_hm(${input[0]!r}, ${output!r}, ${input[1]!r})
 [omicsbma_3]
 # Calculate posterior
 input: 'data/priors.h5', fit_hm.output, test_association.output[1], 'config.yaml'
-output: stamp('data/posterior.h5')
+output: stamp('output/posterior.h5')
 python:
 from OmicsBMA import calculate_posterior
 calculate_posterior(${input[0]!r}, ${input[1]!r}, ${input[2]!r}, ${output!r}, ${input[3]!r})
-run:
-  touch ${output}
 
 [default]
 sos_run('omicsbma')

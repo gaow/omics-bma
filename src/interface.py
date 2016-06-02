@@ -81,4 +81,4 @@ def calculate_posterior(prior_data, mixture_data, association_data, output_file,
                              (prior_data, "/"),
                              (mixture_data, "/pi"),
                              (output_file, "/"), params)
-    pc.ScanBlocks()
+    pc()
