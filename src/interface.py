@@ -20,6 +20,8 @@ def test_association(prior_data, sumstats_data, output_file, params,
                      snp_list = None, block_list = None):
     if isinstance(params, str):
         params = yaml.load(open(params))
+    if 'mixture' in params:
+        del params['mixture']
     params = ArgumentLoader(params)
     env.verbosity = params['verbose']
     params.LoadInputData(genotype_list, phenotype_list, covariate_list, snp_list, block_list)
@@ -59,7 +61,7 @@ def test_association(prior_data, sumstats_data, output_file, params,
 def fit_hm(association_data, output_file, params):
     if isinstance(params, str):
         params = yaml.load(open(params))
-    params = ArgumentLoader(params)
+    params = ArgumentLoader(params['mixture'])
     data = pd.concat(load(association_data, '/log10BFs')).rename(columns = {'nb_groups' : 'null'})
     # FIXME: need to implement penalized null
     data['null'] = 0
@@ -67,7 +69,9 @@ def fit_hm(association_data, output_file, params):
         data = data[[x for x in data.columns if not x.endswith('.avg')]]
     # scale data
     data = data.subtract(data.max(axis = 1), axis = 0)
-    res, converged = mixIP(np.power(10, data), control = params["optimizer_control"])
+    prior = [params['null_penalty'] if idx == 0 else 1 for idx in range(data.shape[1])] \
+            if params['null_penalty'] is not None else None
+    res, converged = mixIP(np.power(10, data), prior = prior, control = params["optimizer_control"])
     if not converged:
         env.logger.error("Convex optimization for hierarchical Model did not converge!")
     save(output_file, {"pi": pd.Series(res, index = data.columns)}, compression=("zlib", 9))

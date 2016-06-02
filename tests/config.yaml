@@ -30,3 +30,6 @@ analysis:
   fiterr: 0.5
   nb_groups: 3
   bf_config: sin
+
+mixture:
+  null_penalty: 10

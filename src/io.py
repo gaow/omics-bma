@@ -44,6 +44,7 @@ class ArgumentLoader(dict):
                      'bfs': 'sin',
                      'cis': 1000,
                      'wrtsize': 10,
+                     'null_penalty': None,
                      'optimizer_control': {}})
         if 'optimizer_control' in params:
             self['optimizer_control'].update(params['optimizer_control'])
@@ -72,6 +73,8 @@ class ArgumentLoader(dict):
                 raise ValueError('Please specify ``{}`` file name!'.format(names[name]))
             if not os.path.isfile(self[name]):
                 raise OSError('Cannot find ``{}`` file ``{}``!'.format(names[name], self[name]))
+        if self['null_penalty'] and not isinstance(self['null_penalty'], int):
+            raise ValueError("``null_penalty`` must be integer, not ``{}``!".format(self['null_penalty']))
 
     def Dump(self):
         return dict2str(self)
