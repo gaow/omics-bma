@@ -6,8 +6,8 @@ import glob, os
 [parameters]
 wiki = 'output/bma'
 project = 'bma'
-page = 'labnotes/concepts.notes'
-pages = ['labnotes/concepts.notes', 'labnotes/tutorials.notes', 'labnotes/applications-GTEx-mash.notes']
+page = 'labnotes/tutorials.notes'
+pages = ['labnotes/concepts', 'labnotes/tutorials', 'labnotes/applications-GTEx-mash']
 asset = 'output'
 
 [markdown_1]
@@ -17,18 +17,19 @@ run:
 [markdown_2]
 asset_dir = [os.path.abspath(x) for x in asset.split('+')]
 input: page, pattern = '{name}.notes', group_by = 'single'
-output: expand_pattern('{_name}.rmd')
+output: expand_pattern('{_name}.md')
 task: concurrent = True
 run:
-  labnotes markdown ${_input} -o ${_output} --suffix rmd --lite -s `date` `git rev-parse HEAD`\
+  labnotes markdown ${_input} -o ${_output} --lite -s `date` `git rev-parse HEAD`\
     --fig_path_adj "figures figures output" --asset_path ${asset_dir}
 
 [bookdown_1]
-input: [x[:-5] + 'rmd' for x in pages]
+input: [x + '.md' for x in pages]
 output: '${wiki}/index.html'
 run:
-  labnotes bind --md ${input} -o '${wiki}' \
-		-a "Gao Wang" -t "OmicsBMA" --description "A machinery to interrogate genomics / transcriptomics data using Bayesian Model Averaging" --lite
+  cat ${input} > /tmp/index.rmd
+  labnotes bind --md /tmp/index.rmd -o '${wiki}' \
+		-a "Gao Wang" -t "OmicsBMA" --description "A machinery to interrogate genomics / transcriptomics data using Bayesian Model Averaging" --lite --no_section_number --split_by chapter
 
 [bookdown_2]
 run:
