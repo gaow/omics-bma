@@ -5,15 +5,28 @@
 ## Notations
 | Notation   | Definition    |  Notes |
 |----------|:-------------:|------:|
-| $K$ | Number of response variables | |
+| $J$ | Number of response variables | |
 | $N$ | Sample size | |
-| $\mathbf{Y}\mapsto{\rm R}^{N \times K}$ | | |
-|$\mathbf{X}\mapsto{\rm R}^N$| | |
-| $\beta\mapsto{\rm R}^{K}$ |  | |
-| | | |
+| $Y\mapsto{\rm R}^{J}$ | | |
+|$X$| | |
+| $\beta\mapsto{\rm R}^{J}$ |  | |
+|$\Sigma\mapsto{\rm R}^{J \times J}$ | | |
+|$V$| \hat{\Sigma} | | |
 | | | |
 | | | |
 | | | |
 
 ## Basic association model
-Consider the multivariate regression problem \[\mathbf{Y} = \mathbf{X}\beta^T + E,\quad E \sim N_K(0, \Sigma)\]
+Consider a multivariate regression problem
+\[Y \mid X, \beta, \Sigma \sim N_J(X\beta, \Sigma)\]
+The goal is to make inference on $\beta$. 
+A Bayesian model for $\beta$ is adopted
+\[\beta \mid U \sim N_J(0, U)\]
+
+```
+A Bayesian hierachical model with a spike-slap prior on $\beta$ is adopted
+\[\beta \mid \bar{\beta}, U_\phi, \pi_0 \sim \pi_0\delta_0 + (1 - \pi_0)N_J(\bar{\beta}, U_\phi)\]
+\[\bar{\beta} \mid U_\omega \sim N_J(0, U_\omega)\]
+Therefore, \[\beta \mid U_\phi, U_\omega, \pi_0 \sim \pi_0\delta_o + (1 - \pi_0) N_J(0, U_\phi + U_\omega)\]
+Let $U = U_\phi + U_\omega$, then \[\beta \mid U, \pi_0 \sim \pi_0\delta_0 + (1 - \pi_0)N_J(0, U)\]
+```
