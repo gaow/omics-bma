@@ -1,6 +1,9 @@
 #!/usr/bin/env sos-runner
 #fileformat=SOSNB1.0
 
+#%% markdown
+#! # A demo of modularized OmicsBMA data flow
+
 #%% code 1
 %use python
 from OmicsBMA.deepdishio import load
@@ -11,24 +14,55 @@ pd.set_option('display.max_rows', None)
 def pd_concat2(data):
     return pd.concat({k: pd.concat(v) for k, v in data.items() if v})
 
+prior = load('data/priors.h5')
 sstats = pd_concat2(load('output/sumstats_20160602_master.h5'))
+weights = load('output/mixture_20160602_master.h5')
 posterior = load('output/posterior_20160602_master.h5')
 res = load('output/test_association_20160602_master.h5')
 perm_pvals = res['JoinPermPvals']
 jsstats = pd_concat2(res['JoinSstats'])
 l10bfs = pd.concat(res['log10BFs'])
 
+#%% markdown
+#! ## Input prior data
+#! * `gridL` and `gridS` correspond to `eqtlbma` priors
+#! * `Prior*` are customized priors in matrcies which can take for example `mash` priors
+#! * `gridM` are grids for `Prior*`
+
 #%% code 2
-posterior
+for k in sorted(prior):
+  print(k, '\n', prior[k])
+
+#%% markdown
+#! ## Single gene-snp association summary statistics
+#! Association analysis results equivalent to `matrixEQTL` implementation
 
 #%% code 3
 sstats
 
+#%% markdown
+#! ## Joint association analysis among groups
+
 #%% code 4
 jsstats
+
+#%% markdown
+#! ## Approximate Bayes factor on `log10` scale
 
 #%% code 5
 l10bfs
 
+#%% markdown
+#! ## Mixture weights
+#! Learned from convex optimization, 10 fold panelty applied to `null`
+
 #%% code 6
-perm_pvals
+weights['pi']
+
+#%% markdown
+#! ## Posterior quantities
+#! Example output of `gene1:snp1`
+
+#%% code 7
+for k in sorted(posterior['gene1']['snp1']):
+  print(k, ':\n', posterior['gene1']['snp1'][k], '\n')
